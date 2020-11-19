@@ -1,7 +1,7 @@
 # Проект «Киноман» [![Build status][travis-image]][travis-url]
 
 * Студент: [Татьяна Манахова](https://up.htmlacademy.ru/ecmascript/13/user/1343593).
-* Наставник: `Неизвестно`.
+* Наставник: [Дмитрий Марков](https://up.htmlacademy.ru/ecmascript/13/user/83550).
 
 ---
 
