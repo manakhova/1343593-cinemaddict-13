@@ -48,13 +48,13 @@ const generateDescription = () => {
 
 const generatePoster = () => {
   const posters = [
-    `made-for-each-other`,
-    `popeye-meets-sinbad`,
-    `sagebrush-trail`,
-    `santa-claus-conquers-the-martians`,
-    `the-dance-of-life`,
-    `the-great-flamarion`,
-    `the-man-with-the-golden-arm`
+    `made-for-each-other.png`,
+    `popeye-meets-sinbad.png`,
+    `sagebrush-trail.jpg`,
+    `santa-claus-conquers-the-martians.jpg`,
+    `the-dance-of-life.jpg`,
+    `the-great-flamarion.jpg`,
+    `the-man-with-the-golden-arm.jpg`
   ];
   const randomIndex = getRandomInteger(0, posters.length - 1);
 
