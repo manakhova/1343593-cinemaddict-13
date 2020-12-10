@@ -1,18 +1,18 @@
-import {getRandomInteger} from "./utils.js";
-import {createProfileTemplate} from "./view/profile.js";
-import {createSiteMemuContainerTemplate} from "./view/site-menu.js";
-import {createFilterTemplate} from "./view/filter.js";
-import {createStatsTemplate} from "./view/stats.js";
-import {createSortingTemplate} from "./view/sorting.js";
-import {createFilmsContainerTemplate} from "./view/films-container.js";
-import {createFilmCardTemplate} from "./view/film-card.js";
-import {createShowMoreButtonTemplate} from "./view/show-more-button.js";
-import {createPopupTemplate} from "./view/popup.js";
-import {createCommentTemplate} from "./view/comment.js";
-import {createNewCommentTemplate} from "./view/new-comment.js";
-import {generateFilm} from "./mock/film-mock.js";
-import {generateComment} from "./mock/comment-mock.js";
-import {generateFilter} from "./mock/filter-mock.js";
+import {getRandomInteger, render, RenderPosition} from "./utils";
+import ProfileView from "./view/profile";
+import SiteMenuView from "./view/site-menu";
+import FilterView from "./view/filter";
+import StatsView from "./view/stats";
+import SortView from "./view/sorting";
+import FilmsContainerView from "./view/films-container";
+import FilmCardView from "./view/film-card";
+import ShowMoreButtonView from "./view/show-more-button";
+import FilmPopupView from "./view/popup";
+import CommentView from "./view/comment";
+import NewCommentView from "./view/new-comment";
+import {generateFilm} from "./mock/film-mock";
+import {generateComment} from "./mock/comment-mock";
+import {generateFilter} from "./mock/filter-mock";
 
 const FILMS_COUNT = 19;
 const FILMS_COUNT_PER_STEP = 5;
@@ -20,72 +20,98 @@ const EXTRA_FILMS_COUNT = 2;
 const films = new Array(FILMS_COUNT).fill().map(generateFilm);
 const filters = generateFilter(films);
 
-const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
 
 const siteMainElement = document.querySelector(`.main`);
 const headerMainElement = document.querySelector(`.header`);
 const footerMainElement = document.querySelector(`.footer`);
 
-render(headerMainElement, createProfileTemplate(), `beforeend`);
-render(siteMainElement, createSiteMemuContainerTemplate(), `beforeend`);
+render(headerMainElement, new ProfileView().getElement(), RenderPosition.BEFOREEND);
+render(siteMainElement, new SiteMenuView().getElement(), RenderPosition.BEFOREEND);
 
 const menuContainer = siteMainElement.querySelector(`.main-navigation`);
 
-render(menuContainer, createFilterTemplate(filters), `beforeend`);
-render(menuContainer, createStatsTemplate(), `beforeend`);
-render(siteMainElement, createSortingTemplate(), `beforeend`);
-render(siteMainElement, createFilmsContainerTemplate(), `beforeend`);
+render(menuContainer, new FilterView(filters).getElement(), RenderPosition.BEFOREEND);
+render(menuContainer, new StatsView().getElement(), RenderPosition.BEFOREEND);
+render(siteMainElement, new SortView().getElement(), RenderPosition.BEFOREEND);
+render(siteMainElement, new FilmsContainerView().getElement(), RenderPosition.BEFOREEND);
 
 const filmsMainList = siteMainElement.querySelector(`.films-list:first-of-type`);
 const filmsMainContainer = filmsMainList.querySelector(`.films-list__container`);
 const filmsExtraLists = siteMainElement.querySelectorAll(`.films-list--extra`);
 
+// ф-я для отрисоки карточек + всякие обработчики
+const renderFilm = (container, film) => {
+  const filmCard = new FilmCardView(film);
+  const filmPopup = new FilmPopupView(film);
+
+  // комментарии. Поскольку я вынесла их отдельно от попапа, приходится отрисовывать прямо тут.
+  // Можно сделать как-то красивее? Может, вернуть их разметку в попап?
+  const commentsList = filmPopup.getElement().querySelector(`.film-details__comments-list`);
+  const comments = new Array(film.comments).fill().map(generateComment);// вот так получилось синхронизировать
+
+  for (let i = 0; i < film.comments; i++) {
+    render(commentsList, new CommentView(comments[i]).getElement(), RenderPosition.BEFOREEND);
+  }
+
+  // форма комментария
+  const commentsContainer = filmPopup.getElement().querySelector(`.film-details__comments-wrap`);
+  render(commentsContainer, new NewCommentView().getElement(), RenderPosition.BEFOREEND);
+
+  // обработчики на элементы карточки и попапа
+  const filmPoster = filmCard.getElement().querySelector(`.film-card__poster`);
+  const filmTitle = filmCard.getElement().querySelector(`.film-card__title`);
+  const filmComments = filmCard.getElement().querySelector(`.film-card__comments`);
+
+  const popupCloseButton = filmPopup.getElement().querySelector(`.film-details__close-btn`);
+
+  const filmElements = [filmPoster, filmTitle, filmComments];
+
+  const filmCardClickHandler = () => {
+    render(footerMainElement, filmPopup.getElement(), RenderPosition.AFTEREND);
+  };
+  const popupCloseButtonClickHandler = () => {
+    filmPopup.getElement().remove();
+  };
+
+  filmElements.forEach((element) => {
+    element.addEventListener(`click`, filmCardClickHandler);
+  });
+  popupCloseButton.addEventListener(`click`, popupCloseButtonClickHandler);
+
+  render(container, filmCard.getElement(), RenderPosition.BEFOREEND);
+};
+
 // фильмы
 for (let i = 0; i < Math.min(films.length, FILMS_COUNT_PER_STEP); i++) {
-  render(filmsMainContainer, createFilmCardTemplate(films[i]), `beforeend`);
+  renderFilm(filmsMainContainer, films[i]);
 }
 
 if (films.length > FILMS_COUNT_PER_STEP) {
   let renderedFilmCount = FILMS_COUNT_PER_STEP;
 
-  render(filmsMainList, createShowMoreButtonTemplate(), `beforeend`);
+  render(filmsMainList, new ShowMoreButtonView().getElement(), RenderPosition.BEFOREEND);
 
   const showMoreButton = filmsMainList.querySelector(`.films-list__show-more`);
 
-  showMoreButton.addEventListener(`click`, (evt) => {
+  const showMoreButtonClickHandler = (evt) => {
     evt.preventDefault();
     films.slice(renderedFilmCount, renderedFilmCount + FILMS_COUNT_PER_STEP)
-    .forEach((film) => render(filmsMainContainer, createFilmCardTemplate(film), `beforeend`));
+    .forEach((film) => renderFilm(filmsMainContainer,film));
     renderedFilmCount += FILMS_COUNT_PER_STEP;
 
     if (renderedFilmCount >= films.length) {
       showMoreButton.remove();
     }
-  });
+  };
+
+  showMoreButton.addEventListener(`click`, showMoreButtonClickHandler);
 }
+
 
 filmsExtraLists.forEach((list) => {
   const filmsExtraContainer = list.querySelector(`.films-list__container`);
 
   for (let i = 0; i < EXTRA_FILMS_COUNT; i++) {
-    render(filmsExtraContainer, createFilmCardTemplate(films[i]), `beforeend`);
+    render(filmsExtraContainer, new FilmCardView(films[i]).getElement(), RenderPosition.BEFOREEND);
   }
 });
-
-render(footerMainElement, createPopupTemplate(films[0]), `afterend`);
-// для примера отрисовала для 1 карточки. Или нужно сделать для всех?
-
-// комментарии
-const commentsList = document.querySelector(`.film-details__comments-list`);
-const randomCommentsQauntity = getRandomInteger(0, 5);
-const comments = new Array(randomCommentsQauntity).fill().map(generateComment);
-
-for (let i = 0; i < randomCommentsQauntity; i++) {
-  render(commentsList, createCommentTemplate(comments[i]), `beforeend`);
-}
-
-// форма комментария
-const commentsContainer = document.querySelector(`.film-details__comments-wrap`);
-render(commentsList, createNewCommentTemplate(), `beforeend`);

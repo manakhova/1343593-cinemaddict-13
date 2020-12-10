@@ -1,4 +1,4 @@
-import {getRandomInteger, shuffleArray, generateDate} from "../utils.js";
+import {getRandomInteger, shuffleArray, generateDate} from "../utils";
 
 const generateTitle = () => {
   const titles = [
@@ -48,13 +48,13 @@ const generateDescription = () => {
 
 const generatePoster = () => {
   const posters = [
-    `made-for-each-other`,
-    `popeye-meets-sinbad`,
-    `sagebrush-trail`,
-    `santa-claus-conquers-the-martians`,
-    `the-dance-of-life`,
-    `the-great-flamarion`,
-    `the-man-with-the-golden-arm`
+    `made-for-each-other.png`,
+    `popeye-meets-sinbad.png`,
+    `sagebrush-trail.jpg`,
+    `santa-claus-conquers-the-martians.jpg`,
+    `the-dance-of-life.jpg`,
+    `the-great-flamarion.jpg`,
+    `the-man-with-the-golden-arm.jpg`
   ];
   const randomIndex = getRandomInteger(0, posters.length - 1);
 
@@ -140,7 +140,7 @@ export const generateFilm = () => {
     country: generateCountry(),
     genre: generateGenre(),
     age: generateAge(),
-    comments: getRandomInteger(0, 5), // как отобразить здесь то колв-во комментариев, которое генерируется в main.js?
+    comments: getRandomInteger(0, 5),
     isInWatchlist: Boolean(getRandomInteger(0, 1)),
     isInHistory: Boolean(getRandomInteger(0, 1)),
     isFavotite: Boolean(getRandomInteger(0, 1))

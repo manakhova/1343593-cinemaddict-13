@@ -1,5 +1,9 @@
-export const createPopupTemplate = (film) => {
-  const {title, originalTitle, poster, director, writers, actors, description, rating, year, duration, country, genre, age} = film;
+import {createElement} from "../utils";
+
+const createPopupTemplate = (film) => {
+  const {title, originalTitle, poster, director, writers, actors, description, rating, year, duration, country, genre, age, comments} = film;
+  const date = year.format(`D MMMM YYYY`);
+
   return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
       <div class="film-details__top-container">
@@ -8,7 +12,7 @@ export const createPopupTemplate = (film) => {
         </div>
         <div class="film-details__info-wrap">
           <div class="film-details__poster">
-            <img class="film-details__poster-img" src="./images/posters/${poster}.jpg" alt="">
+            <img class="film-details__poster-img" src="./images/posters/${poster}" alt="">
 
             <p class="film-details__age">${age}</p>
           </div>
@@ -40,7 +44,7 @@ export const createPopupTemplate = (film) => {
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Release Date</td>
-                <td class="film-details__cell">${year.format(`D MMMM YYYY`)}</td>
+                <td class="film-details__cell">${date}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Runtime</td>
@@ -78,7 +82,7 @@ export const createPopupTemplate = (film) => {
 
       <div class="film-details__bottom-container">
         <section class="film-details__comments-wrap">
-          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">4</span></h3>
+          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments}</span></h3>
 
           <ul class="film-details__comments-list">
           </ul>
@@ -87,3 +91,26 @@ export const createPopupTemplate = (film) => {
     </form>
   </section>`;
 };
+
+export default class FilmPopup {
+  constructor(film) {
+    this._film = film;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPopupTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

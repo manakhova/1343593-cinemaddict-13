@@ -1,4 +1,4 @@
-import {getRandomInteger, shuffleArray, generateDate} from "../utils.js";
+import {getRandomInteger, shuffleArray, generateDate} from "../utils";
 
 const generateText = () => {
   const textItems = [

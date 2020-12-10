@@ -1,14 +1,18 @@
-export const createFilmCardTemplate = (film) => {
+import {createElement} from "../utils";
+
+const createFilmCardTemplate = (film) => {
   const {title, poster, description, rating, year, duration, genre, comments} = film;
+  const date = year.format(`YYYY`);
+
   return `<article class="film-card">
     <h3 class="film-card__title">${title}</h3>
     <p class="film-card__rating">${rating}</p>
     <p class="film-card__info">
-      <span class="film-card__year">${year.format(`YYYY`)}</span>
+      <span class="film-card__year">${date}</span>
       <span class="film-card__duration">${duration}</span>
       <span class="film-card__genre">${genre}</span>
     </p>
-    <img src="./images/posters/${poster}.jpg" alt="" class="film-card__poster">
+    <img src="./images/posters/${poster}" alt="" class="film-card__poster">
     <p class="film-card__description">${description}</p>
     <a class="film-card__comments">${comments} comments</a>
     <div class="film-card__controls">
@@ -17,4 +21,27 @@ export const createFilmCardTemplate = (film) => {
       <button class="film-card__controls-item button film-card__controls-item--favorite" type="button">Mark as favorite</button>
     </div>
   </article>`;
-};// как предусмотреть формат картинки, потому что постеры есть и в png?
+};
+
+export default class FilmCard {
+  constructor(film) {
+    this._film = film;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmCardTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
