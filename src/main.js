@@ -1,18 +1,18 @@
-import {getRandomInteger, render, RenderPosition} from "./utils.js";
-import ProfileView from "./view/profile.js";
-import SiteMenuView from "./view/site-menu.js";
-import FilterView from "./view/filter.js";
-import StatsView from "./view/stats.js";
-import SortView from "./view/sorting.js";
-import FilmsContainerView from "./view/films-container.js";
-import FilmCardView from "./view/film-card.js";
-import ShowMoreButtonView from "./view/show-more-button.js";
-import FilmPopupView from "./view/popup.js";
-import CommentView from "./view/comment.js";
-import NewCommentView from "./view/new-comment.js";
-import {generateFilm} from "./mock/film-mock.js";
-import {generateComment} from "./mock/comment-mock.js";
-import {generateFilter} from "./mock/filter-mock.js";
+import {getRandomInteger, render, RenderPosition} from "./utils";
+import ProfileView from "./view/profile";
+import SiteMenuView from "./view/site-menu";
+import FilterView from "./view/filter";
+import StatsView from "./view/stats";
+import SortView from "./view/sorting";
+import FilmsContainerView from "./view/films-container";
+import FilmCardView from "./view/film-card";
+import ShowMoreButtonView from "./view/show-more-button";
+import FilmPopupView from "./view/popup";
+import CommentView from "./view/comment";
+import NewCommentView from "./view/new-comment";
+import {generateFilm} from "./mock/film-mock";
+import {generateComment} from "./mock/comment-mock";
+import {generateFilter} from "./mock/filter-mock";
 
 const FILMS_COUNT = 19;
 const FILMS_COUNT_PER_STEP = 5;
@@ -39,7 +39,7 @@ const filmsMainList = siteMainElement.querySelector(`.films-list:first-of-type`)
 const filmsMainContainer = filmsMainList.querySelector(`.films-list__container`);
 const filmsExtraLists = siteMainElement.querySelectorAll(`.films-list--extra`);
 
-//ф-я для отрисоки карточек + всякие обработчики
+// ф-я для отрисоки карточек + всякие обработчики
 const renderFilm = (container, film) => {
   const filmCard = new FilmCardView(film);
   const filmPopup = new FilmPopupView(film);
@@ -47,17 +47,15 @@ const renderFilm = (container, film) => {
   // комментарии. Поскольку я вынесла их отдельно от попапа, приходится отрисовывать прямо тут.
   // Можно сделать как-то красивее? Может, вернуть их разметку в попап?
   const commentsList = filmPopup.getElement().querySelector(`.film-details__comments-list`);
-  const randomCommentsCount = getRandomInteger(0, 5);
-  const comments = new Array(randomCommentsCount).fill().map(generateComment);
+  const comments = new Array(film.comments).fill().map(generateComment);// вот так получилось синхронизировать
 
-  for (let i = 0; i < randomCommentsCount; i++) {
+  for (let i = 0; i < film.comments; i++) {
     render(commentsList, new CommentView(comments[i]).getElement(), RenderPosition.BEFOREEND);
-    // комментарии, почему-то не отрисовываются. Не вижу, где проблема.
   }
 
   // форма комментария
-  const commentsContainer = document.querySelector(`.film-details__comments-wrap`);
-  render(commentsList, new NewCommentView().getElement(), `beforeend`);
+  const commentsContainer = filmPopup.getElement().querySelector(`.film-details__comments-wrap`);
+  render(commentsContainer, new NewCommentView().getElement(), RenderPosition.BEFOREEND);
 
   // обработчики на элементы карточки и попапа
   const filmPoster = filmCard.getElement().querySelector(`.film-card__poster`);
@@ -68,15 +66,17 @@ const renderFilm = (container, film) => {
 
   const filmElements = [filmPoster, filmTitle, filmComments];
 
-  filmElements.forEach((element) => {
-    element.addEventListener(`click`, () => {
-      render(footerMainElement, filmPopup.getElement(), RenderPosition.AFTEREND);
-    });
-  });
-
-  popupCloseButton.addEventListener(`click`, () => {
+  const filmCardClickHandler = () => {
+    render(footerMainElement, filmPopup.getElement(), RenderPosition.AFTEREND);
+  };
+  const popupCloseButtonClickHandler = () => {
     filmPopup.getElement().remove();
+  };
+
+  filmElements.forEach((element) => {
+    element.addEventListener(`click`, filmCardClickHandler);
   });
+  popupCloseButton.addEventListener(`click`, popupCloseButtonClickHandler);
 
   render(container, filmCard.getElement(), RenderPosition.BEFOREEND);
 };
@@ -93,7 +93,7 @@ if (films.length > FILMS_COUNT_PER_STEP) {
 
   const showMoreButton = filmsMainList.querySelector(`.films-list__show-more`);
 
-  showMoreButton.addEventListener(`click`, (evt) => {
+  const showMoreButtonClickHandler = (evt) => {
     evt.preventDefault();
     films.slice(renderedFilmCount, renderedFilmCount + FILMS_COUNT_PER_STEP)
     .forEach((film) => renderFilm(filmsMainContainer,film));
@@ -102,7 +102,9 @@ if (films.length > FILMS_COUNT_PER_STEP) {
     if (renderedFilmCount >= films.length) {
       showMoreButton.remove();
     }
-  });
+  };
+
+  showMoreButton.addEventListener(`click`, showMoreButtonClickHandler);
 }
 
 

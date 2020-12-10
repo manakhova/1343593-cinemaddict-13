@@ -1,7 +1,7 @@
-import {createElement} from "../utils.js";
+import {createElement} from "../utils";
 
 const createPopupTemplate = (film) => {
-  const {title, originalTitle, poster, director, writers, actors, description, rating, year, duration, country, genre, age} = film;
+  const {title, originalTitle, poster, director, writers, actors, description, rating, year, duration, country, genre, age, comments} = film;
   const date = year.format(`D MMMM YYYY`);
 
   return `<section class="film-details">
@@ -82,7 +82,7 @@ const createPopupTemplate = (film) => {
 
       <div class="film-details__bottom-container">
         <section class="film-details__comments-wrap">
-          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">4</span></h3>
+          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments}</span></h3>
 
           <ul class="film-details__comments-list">
           </ul>

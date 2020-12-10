@@ -1,4 +1,4 @@
-import {getRandomInteger, shuffleArray, generateDate} from "../utils.js";
+import {getRandomInteger, shuffleArray, generateDate} from "../utils";
 
 const generateTitle = () => {
   const titles = [
@@ -140,7 +140,7 @@ export const generateFilm = () => {
     country: generateCountry(),
     genre: generateGenre(),
     age: generateAge(),
-    comments: getRandomInteger(0, 5), // как отобразить здесь то колв-во комментариев, которое генерируется в main.js?
+    comments: getRandomInteger(0, 5),
     isInWatchlist: Boolean(getRandomInteger(0, 1)),
     isInHistory: Boolean(getRandomInteger(0, 1)),
     isFavotite: Boolean(getRandomInteger(0, 1))
