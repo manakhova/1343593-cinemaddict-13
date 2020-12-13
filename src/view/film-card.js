@@ -1,7 +1,7 @@
 import {createElement} from "../utils";
 
 const createFilmCardTemplate = (film) => {
-  const {title, poster, description, rating, year, duration, genre, comments} = film;
+  const {title, poster, description, rating, year, duration, genre, commentsCount} = film;
   const date = year.format(`YYYY`);
 
   return `<article class="film-card">
@@ -14,7 +14,7 @@ const createFilmCardTemplate = (film) => {
     </p>
     <img src="./images/posters/${poster}" alt="" class="film-card__poster">
     <p class="film-card__description">${description}</p>
-    <a class="film-card__comments">${comments} comments</a>
+    <a class="film-card__comments">${commentsCount} comments</a>
     <div class="film-card__controls">
       <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist" type="button">Add to watchlist</button>
       <button class="film-card__controls-item button film-card__controls-item--mark-as-watched" type="button">Mark as watched</button>

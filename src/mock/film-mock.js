@@ -140,7 +140,7 @@ export const generateFilm = () => {
     country: generateCountry(),
     genre: generateGenre(),
     age: generateAge(),
-    comments: getRandomInteger(0, 5),
+    commentsCount: getRandomInteger(0, 5),
     isInWatchlist: Boolean(getRandomInteger(0, 1)),
     isInHistory: Boolean(getRandomInteger(0, 1)),
     isFavotite: Boolean(getRandomInteger(0, 1))

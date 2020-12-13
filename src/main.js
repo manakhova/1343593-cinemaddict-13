@@ -5,6 +5,7 @@ import FilterView from "./view/filter";
 import StatsView from "./view/stats";
 import SortView from "./view/sorting";
 import FilmsContainerView from "./view/films-container";
+import NoFilmView from "./view/no-film";
 import FilmCardView from "./view/film-card";
 import ShowMoreButtonView from "./view/show-more-button";
 import FilmPopupView from "./view/popup";
@@ -14,7 +15,7 @@ import {generateFilm} from "./mock/film-mock";
 import {generateComment} from "./mock/comment-mock";
 import {generateFilter} from "./mock/filter-mock";
 
-const FILMS_COUNT = 19;
+const FILMS_COUNT = 22;
 const FILMS_COUNT_PER_STEP = 5;
 const EXTRA_FILMS_COUNT = 2;
 const films = new Array(FILMS_COUNT).fill().map(generateFilm);
@@ -47,9 +48,9 @@ const renderFilm = (container, film) => {
   // комментарии. Поскольку я вынесла их отдельно от попапа, приходится отрисовывать прямо тут.
   // Можно сделать как-то красивее? Может, вернуть их разметку в попап?
   const commentsList = filmPopup.getElement().querySelector(`.film-details__comments-list`);
-  const comments = new Array(film.comments).fill().map(generateComment);// вот так получилось синхронизировать
+  const comments = new Array(film.commentsCount).fill().map(generateComment);// вот так получилось синхронизировать
 
-  for (let i = 0; i < film.comments; i++) {
+  for (let i = 0; i < film.commentsCount; i++) {
     render(commentsList, new CommentView(comments[i]).getElement(), RenderPosition.BEFOREEND);
   }
 
@@ -68,22 +69,42 @@ const renderFilm = (container, film) => {
 
   const filmCardClickHandler = () => {
     render(footerMainElement, filmPopup.getElement(), RenderPosition.AFTEREND);
+
+    popupCloseButton.addEventListener(`click`, popupCloseButtonClickHandler);
+    document.addEventListener(`keydown`, popupEscKeyDownHandler);
   };
+
   const popupCloseButtonClickHandler = () => {
     filmPopup.getElement().remove();
+
+    popupCloseButton.removeEventListener(`click`, popupCloseButtonClickHandler);
+    document.removeEventListener(`keydown`, popupEscKeyDownHandler);
+  };
+
+  const popupEscKeyDownHandler = (evt) => {
+    if (evt.key === `Escape` || evt.key === `Esc`) {
+      evt.preventDefault();
+      filmPopup.getElement().remove();
+
+      popupCloseButton.removeEventListener(`click`, popupCloseButtonClickHandler);
+      document.removeEventListener(`keydown`, popupEscKeyDownHandler);
+    }
   };
 
   filmElements.forEach((element) => {
     element.addEventListener(`click`, filmCardClickHandler);
   });
-  popupCloseButton.addEventListener(`click`, popupCloseButtonClickHandler);
 
   render(container, filmCard.getElement(), RenderPosition.BEFOREEND);
 };
 
 // фильмы
-for (let i = 0; i < Math.min(films.length, FILMS_COUNT_PER_STEP); i++) {
-  renderFilm(filmsMainContainer, films[i]);
+if (films.length === 0) {
+  render(filmsMainList, new NoFilmView().getElement(), RenderPosition.AFTERBEGIN)
+} else {
+  for (let i = 0; i < Math.min(films.length, FILMS_COUNT_PER_STEP); i++) {
+    renderFilm(filmsMainContainer, films[i]);
+  }
 }
 
 if (films.length > FILMS_COUNT_PER_STEP) {
