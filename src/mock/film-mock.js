@@ -1,4 +1,4 @@
-import {getRandomInteger, shuffleArray, generateDate} from "../utils";
+import {getRandomInteger, shuffleArray, generateDate} from "../utils/common";
 
 const generateTitle = () => {
   const titles = [
