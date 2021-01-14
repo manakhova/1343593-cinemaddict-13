@@ -9,13 +9,13 @@ const FILMS_COUNT_PER_STEP = 5;
 // const EXTRA_FILMS_COUNT = 2;
 
 
-export default class FilmsList {
+export default class FilmList {
   constructor(filmsContainer) {
     this._filmsContainer = filmsContainer;
     this._renderedFilmCount = FILMS_COUNT_PER_STEP;
     this._filmPresenter = {};
 
-    this._filmsListComponent = new FilmsContainerView();
+    this._filmListComponent = new FilmsContainerView();
     this._noFilmComponent = new NoFilmView();
     this._showMoreButtonComponent = new ShowMoreButtonView();
 
@@ -27,8 +27,8 @@ export default class FilmsList {
   init(films) {
     this._films = films.slice();
 
-    render(this._filmsContainer, this._filmsListComponent, RenderPosition.BEFOREEND);
-
+    render(this._filmsContainer, this._filmListComponent, RenderPosition.BEFOREEND);
+    // сюда renderSort
     this._renderFilmsContainer();
   }
 
@@ -54,7 +54,7 @@ export default class FilmsList {
   }
 
   _renderNoFilms() {
-    render(this._filmsMainList, this._noFilmComponent, RenderPosition.AFTERBEGIN);
+    render(this._filmMainList, this._noFilmComponent, RenderPosition.AFTERBEGIN);
   }
 
   _handleShowMoreButtonClick() {
@@ -68,7 +68,7 @@ export default class FilmsList {
   }
 
   _renderShowMoreButton() {
-    render(this._filmsMainList, this._showMoreButtonComponent, RenderPosition.BEFOREEND);
+    render(this._filmMainList, this._showMoreButtonComponent, RenderPosition.BEFOREEND);
 
     this._showMoreButtonComponent.setClickHandler(this._handleShowMoreButtonClick);
   }
@@ -85,7 +85,7 @@ export default class FilmsList {
   //   const siteMainElement = document.querySelector(`.main`);
   //   const filmsExtraLists = siteMainElement.querySelectorAll(`.films-list--extra`);
 
-  //   filmsExtraLists.forEach((list) => {
+  //   filmExtraLists.forEach((list) => {
   //     const filmsExtraContainer = list.querySelector(`.films-list__container`);
   //     const filmComponent = new FilmCardView(film);
 
@@ -105,10 +105,10 @@ export default class FilmsList {
 
   _renderFilmsContainer() {
     const siteMainElement = document.querySelector(`.main`);
-    const filmsMainList = siteMainElement.querySelector(`.films-list:first-of-type`);
-    const filmsMainContainer = filmsMainList.querySelector(`.films-list__container`);
+    const filmMainList = siteMainElement.querySelector(`.films-list:first-of-type`);
+    const filmsMainContainer = filmMainList.querySelector(`.films-list__container`);
     // я правильно понимаю, что this._что-то-там - будет видно везде в классе?
-    this._filmsMainList = filmsMainList;
+    this._filmMainList = filmMainList;
     this._filmsMainContainer = filmsMainContainer;
 
     if (this._films.length === 0) {

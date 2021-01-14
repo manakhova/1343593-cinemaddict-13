@@ -6,7 +6,7 @@ import StatsView from "./view/stats";
 import SortView from "./view/sorting";
 import {generateFilm} from "./mock/film-mock";
 import {generateFilter} from "./mock/filter-mock";
-import FilmsListPresenter from "./presenter/films-list.js";
+import FilmsListPresenter from "./presenter/films-list";
 
 const FILMS_COUNT = 21;
 
@@ -25,5 +25,5 @@ render(menuContainer, new FilterView(filters), RenderPosition.BEFOREEND);
 render(menuContainer, new StatsView(), RenderPosition.BEFOREEND);
 render(siteMainElement, new SortView(), RenderPosition.BEFOREEND);
 
-const filmsListPresenter = new FilmsListPresenter(siteMainElement);
-filmsListPresenter.init(films);
+const filmListPresenter = new FilmsListPresenter(siteMainElement);
+filmListPresenter.init(films);
