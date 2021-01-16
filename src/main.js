@@ -3,7 +3,6 @@ import ProfileView from "./view/profile";
 import SiteMenuView from "./view/site-menu";
 import FilterView from "./view/filter";
 import StatsView from "./view/stats";
-import SortView from "./view/sorting";
 import {generateFilm} from "./mock/film-mock";
 import {generateFilter} from "./mock/filter-mock";
 import FilmsListPresenter from "./presenter/films-list";
@@ -23,7 +22,6 @@ const menuContainer = siteMainElement.querySelector(`.main-navigation`);
 
 render(menuContainer, new FilterView(filters), RenderPosition.BEFOREEND);
 render(menuContainer, new StatsView(), RenderPosition.BEFOREEND);
-render(siteMainElement, new SortView(), RenderPosition.BEFOREEND);
 
 const filmListPresenter = new FilmsListPresenter(siteMainElement);
 filmListPresenter.init(films);

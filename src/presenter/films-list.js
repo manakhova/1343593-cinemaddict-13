@@ -1,5 +1,6 @@
 import {render, RenderPosition, remove} from "../utils/render";
-import {updateItem} from "../utils/common.js";
+import {updateItem, sortFilmByDate, sortFilmByRating} from "../utils/common.js";
+import {SortView, SortType} from "../view/sorting";
 import FilmsContainerView from "../view/films-container";
 import NoFilmView from "../view/no-film";
 import ShowMoreButtonView from "../view/show-more-button";
@@ -22,14 +23,49 @@ export default class FilmList {
     this._handleFilmChange = this._handleFilmChange.bind(this);
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init(films) {
     this._films = films.slice();
+    this._sourcedFilms = films.slice();
 
     render(this._filmsContainer, this._filmListComponent, RenderPosition.BEFOREEND);
-    // сюда renderSort
     this._renderFilmsContainer();
+    this._renderSort();
+  }
+
+  _sortFilms(sortType) {
+    switch (sortType) {
+      case SortType.DATE:
+        this._films.sort(sortFilmByDate);
+        break;
+      case SortType.RATING:
+        this._films.sort(sortFilmByRating);
+        break;
+      default:
+        this._films = this._sourcedFilms.slice();
+    }
+
+    this._currentSortType = sortType;
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._sortFilms(sortType);
+    this._clearFilmsContainer();
+    this._renderFilmList();
+  }
+
+  _renderSort() {
+    this._sortComponent = new SortView();
+    this._currentSortType = SortType.DEFAULT;
+
+    render(this._filmList, this._sortComponent, RenderPosition.BEFOREBEGIN);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _handleModeChange() {
@@ -105,9 +141,10 @@ export default class FilmList {
 
   _renderFilmsContainer() {
     const siteMainElement = document.querySelector(`.main`);
+    const filmList = siteMainElement.querySelector(`.films`);
     const filmMainList = siteMainElement.querySelector(`.films-list:first-of-type`);
     const filmsMainContainer = filmMainList.querySelector(`.films-list__container`);
-    // я правильно понимаю, что this._что-то-там - будет видно везде в классе?
+    this._filmList = filmList;
     this._filmMainList = filmMainList;
     this._filmsMainContainer = filmsMainContainer;
 

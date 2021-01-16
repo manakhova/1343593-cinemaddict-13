@@ -30,3 +30,11 @@ export const updateItem = (items, update) => {
     ...items.slice(index + 1)
   ];
 };
+
+export const sortFilmByDate = (filmA, filmB) => {
+  return filmB.year - filmA.year;
+};
+
+export const sortFilmByRating = (filmA, filmB) => {
+  return filmB.rating - filmA.rating;
+};
