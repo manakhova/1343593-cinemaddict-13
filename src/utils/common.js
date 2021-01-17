@@ -16,3 +16,17 @@ export const shuffleArray = (array) => {
 export const generateDate = () => {
   return dayjs(`${getRandomInteger(1910, 2020)}-${getRandomInteger(1, 12)}-${getRandomInteger(1, 28)} ${getRandomInteger(0, 23)}:${getRandomInteger(0, 60)}`);
 };
+
+export const updateItem = (items, update) => {
+  const index = items.findIndex((item) => item.id === update.id);
+
+  if (index === -1) {
+    return items;
+  }
+
+  return [
+    ...items.slice(0, index),
+    update,
+    ...items.slice(index + 1)
+  ];
+};

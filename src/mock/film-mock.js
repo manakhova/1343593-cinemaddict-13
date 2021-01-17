@@ -1,4 +1,5 @@
 import {getRandomInteger, shuffleArray, generateDate} from "../utils/common";
+import {nanoid} from 'nanoid';
 
 const generateTitle = () => {
   const titles = [
@@ -127,6 +128,7 @@ const generateAge = () => {
 
 export const generateFilm = () => {
   return {
+    id: nanoid(),
     title: generateTitle(),
     originalTitle: generateTitle(),
     poster: generatePoster(),
