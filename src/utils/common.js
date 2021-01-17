@@ -30,3 +30,8 @@ export const updateItem = (items, update) => {
     ...items.slice(index + 1)
   ];
 };
+
+export const sortFilmBy = (property) => (filmA, filmB) => {
+  return filmB[property] - filmA[property];
+};
+

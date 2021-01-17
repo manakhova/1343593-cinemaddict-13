@@ -138,16 +138,16 @@ export default class FilmPopup extends AbstractView {
 
   setFavoriteClickHandler(callback) {
     this._callback.favoriteClick = callback;
-    this.getElement().querySelector(`#favorite`).addEventListener(`click`, this._favoriteClickHandler);
+    this.getElement().querySelector(`#favorite`).addEventListener(`change`, this._favoriteClickHandler);
   }
 
   setWatchlistClickHandler(callback) {
     this._callback.watchlistClick = callback;
-    this.getElement().querySelector(`#watchlist`).addEventListener(`click`, this._watchlistClickHandler);
+    this.getElement().querySelector(`#watchlist`).addEventListener(`change`, this._watchlistClickHandler);
   }
 
   setHistoryClickHandler(callback) {
     this._callback.historyClick = callback;
-    this.getElement().querySelector(`#watched`).addEventListener(`click`, this._historyClickHandler);
+    this.getElement().querySelector(`#watched`).addEventListener(`change`, this._historyClickHandler);
   }
 }

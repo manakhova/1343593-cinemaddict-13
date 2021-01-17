@@ -1,5 +1,6 @@
 import {render, RenderPosition, remove} from "../utils/render";
-import {updateItem} from "../utils/common.js";
+import {updateItem, sortFilmBy} from "../utils/common";
+import {SortView, SortType} from "../view/sorting";
 import FilmsContainerView from "../view/films-container";
 import NoFilmView from "../view/no-film";
 import ShowMoreButtonView from "../view/show-more-button";
@@ -9,27 +10,62 @@ const FILMS_COUNT_PER_STEP = 5;
 // const EXTRA_FILMS_COUNT = 2;
 
 
-export default class FilmsList {
+export default class FilmList {
   constructor(filmsContainer) {
     this._filmsContainer = filmsContainer;
     this._renderedFilmCount = FILMS_COUNT_PER_STEP;
     this._filmPresenter = {};
 
-    this._filmsListComponent = new FilmsContainerView();
+    this._filmListComponent = new FilmsContainerView();
     this._noFilmComponent = new NoFilmView();
     this._showMoreButtonComponent = new ShowMoreButtonView();
 
     this._handleFilmChange = this._handleFilmChange.bind(this);
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init(films) {
     this._films = films.slice();
+    this._sourcedFilms = films.slice();
 
-    render(this._filmsContainer, this._filmsListComponent, RenderPosition.BEFOREEND);
-
+    render(this._filmsContainer, this._filmListComponent, RenderPosition.BEFOREEND);
     this._renderFilmsContainer();
+    this._renderSort();
+  }
+
+  _sortFilms(sortType) {
+    switch (sortType) {
+      case SortType.DATE:
+        this._films.sort(sortFilmBy(`year`));
+        break;
+      case SortType.RATING:
+        this._films.sort(sortFilmBy(`rating`));
+        break;
+      default:
+        this._films = this._sourcedFilms.slice();
+    }
+
+    this._currentSortType = sortType;
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._sortFilms(sortType);
+    this._clearFilmsContainer();
+    this._renderFilmList();
+  }
+
+  _renderSort() {
+    this._sortComponent = new SortView();
+    this._currentSortType = SortType.DEFAULT;
+
+    render(this._filmList, this._sortComponent, RenderPosition.BEFOREBEGIN);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _handleModeChange() {
@@ -54,7 +90,7 @@ export default class FilmsList {
   }
 
   _renderNoFilms() {
-    render(this._filmsMainList, this._noFilmComponent, RenderPosition.AFTERBEGIN);
+    render(this._filmMainList, this._noFilmComponent, RenderPosition.AFTERBEGIN);
   }
 
   _handleShowMoreButtonClick() {
@@ -68,7 +104,7 @@ export default class FilmsList {
   }
 
   _renderShowMoreButton() {
-    render(this._filmsMainList, this._showMoreButtonComponent, RenderPosition.BEFOREEND);
+    render(this._filmMainList, this._showMoreButtonComponent, RenderPosition.BEFOREEND);
 
     this._showMoreButtonComponent.setClickHandler(this._handleShowMoreButtonClick);
   }
@@ -85,7 +121,7 @@ export default class FilmsList {
   //   const siteMainElement = document.querySelector(`.main`);
   //   const filmsExtraLists = siteMainElement.querySelectorAll(`.films-list--extra`);
 
-  //   filmsExtraLists.forEach((list) => {
+  //   filmExtraLists.forEach((list) => {
   //     const filmsExtraContainer = list.querySelector(`.films-list__container`);
   //     const filmComponent = new FilmCardView(film);
 
@@ -105,10 +141,11 @@ export default class FilmsList {
 
   _renderFilmsContainer() {
     const siteMainElement = document.querySelector(`.main`);
-    const filmsMainList = siteMainElement.querySelector(`.films-list:first-of-type`);
-    const filmsMainContainer = filmsMainList.querySelector(`.films-list__container`);
-    // я правильно понимаю, что this._что-то-там - будет видно везде в классе?
-    this._filmsMainList = filmsMainList;
+    const filmList = siteMainElement.querySelector(`.films`);
+    const filmMainList = siteMainElement.querySelector(`.films-list:first-of-type`);
+    const filmsMainContainer = filmMainList.querySelector(`.films-list__container`);
+    this._filmList = filmList;
+    this._filmMainList = filmMainList;
     this._filmsMainContainer = filmsMainContainer;
 
     if (this._films.length === 0) {
