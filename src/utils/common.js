@@ -31,7 +31,7 @@ export const updateItem = (items, update) => {
   ];
 };
 
-export const sortFilm = (filmA, filmB, property) => {
+export const sortFilmBy = (property) => (filmA, filmB) => {
   return filmB[property] - filmA[property];
 };
 

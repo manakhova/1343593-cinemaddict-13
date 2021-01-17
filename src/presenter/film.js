@@ -72,11 +72,13 @@ export default class Film {
     }
 
     if (this._mode === Mode.POPUP) {
+      // саму каточку, даже в режиме попапа, тоже надо заменить на обновленную,
+      // иначе она просто удалялась ниже
       replace(this._filmComponent, prevFilmComponent);
       replace(this._filmPopupComponent, prevFilmPopupComponent);
     }
 
-    // remove(prevFilmComponent);
+    remove(prevFilmComponent);
     remove(prevFilmPopupComponent);
   }
 
