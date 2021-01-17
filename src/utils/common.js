@@ -31,10 +31,7 @@ export const updateItem = (items, update) => {
   ];
 };
 
-export const sortFilmByDate = (filmA, filmB) => {
-  return filmB.year - filmA.year;
+export const sortFilm = (filmA, filmB, property) => {
+  return filmB[property] - filmA[property];
 };
 
-export const sortFilmByRating = (filmA, filmB) => {
-  return filmB.rating - filmA.rating;
-};

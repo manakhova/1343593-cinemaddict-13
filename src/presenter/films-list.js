@@ -1,5 +1,5 @@
 import {render, RenderPosition, remove} from "../utils/render";
-import {updateItem, sortFilmByDate, sortFilmByRating} from "../utils/common.js";
+import {updateItem, sortFilm} from "../utils/common";
 import {SortView, SortType} from "../view/sorting";
 import FilmsContainerView from "../view/films-container";
 import NoFilmView from "../view/no-film";
@@ -38,10 +38,10 @@ export default class FilmList {
   _sortFilms(sortType) {
     switch (sortType) {
       case SortType.DATE:
-        this._films.sort(sortFilmByDate);
+        this._films.sort(sortFilm);
         break;
       case SortType.RATING:
-        this._films.sort(sortFilmByRating);
+        this._films.sort(sortFilm);
         break;
       default:
         this._films = this._sourcedFilms.slice();
