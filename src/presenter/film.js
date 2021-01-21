@@ -1,8 +1,5 @@
 import FilmCardView from "../view/film-card";
 import FilmPopupView from "../view/popup";
-import CommentView from "../view/comment";
-import NewCommentView from "../view/new-comment";
-import {generateComment} from "../mock/comment-mock";
 import {render, RenderPosition, remove, replace} from "../utils/render";
 
 const Mode = {
@@ -36,17 +33,6 @@ export default class Film {
 
     this._filmComponent = new FilmCardView(film);
     this._filmPopupComponent = new FilmPopupView(film);
-    this._newCommentComponent = new NewCommentView();
-
-    const commentsList = this._filmPopupComponent.getElement().querySelector(`.film-details__comments-list`);
-    const comments = new Array(this._film.commentsCount).fill().map(generateComment);
-
-    for (let i = 0; i < this._film.commentsCount; i++) {
-      render(commentsList, new CommentView(comments[i]), RenderPosition.BEFOREEND);
-    }
-
-    const commentsContainer = this._filmPopupComponent.getElement().querySelector(`.film-details__comments-wrap`);
-    render(commentsContainer, this._newCommentComponent, RenderPosition.BEFOREEND);
 
     this._filmComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._filmComponent.setHistoryClickHandler(this._handleHistoryClick);
@@ -72,8 +58,6 @@ export default class Film {
     }
 
     if (this._mode === Mode.POPUP) {
-      // саму каточку, даже в режиме попапа, тоже надо заменить на обновленную,
-      // иначе она просто удалялась ниже
       replace(this._filmComponent, prevFilmComponent);
       replace(this._filmPopupComponent, prevFilmPopupComponent);
     }
@@ -141,9 +125,7 @@ export default class Film {
     this._filmPopupComponent.getElement().remove();
 
     this._mode = Mode.DEFAULT;
-
-    this._filmPopupComponent.removeClosePopupHandler(this._handlePopupCloseButtonClick);
-    document.removeEventListener(`keydown`, this._handlePopupEscKeyDown);
+    // this._filmPopupComponent.reset(this._film); // выдает ошибку при сбросе
   }
 
   _handlePopupCloseButtonClick() {
