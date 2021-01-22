@@ -101,7 +101,7 @@ export default class Film {
             {},
             this._film,
             {
-              isFavotite: !this._film.isFavotite
+              isFavorite: !this._film.isFavorite
             }
         )
     );

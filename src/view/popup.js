@@ -46,6 +46,11 @@ const createNewCommentTemplate = (emojiList) => {
   </div>`;
 };
 
+const createButtonTemplate = (buttonIdName, isActive, buttonName) => {
+  return `<input type="checkbox" ${isActive ? `checked` : ``} class="film-details__control-input visually-hidden" id="${buttonIdName}" name="${buttonIdName}">
+  <label for="${buttonIdName}" class="film-details__control-label film-details__control-label--${buttonIdName}">${buttonName}</label>`;
+};
+
 const createPopupTemplate = (film) => {
   const {title, originalTitle, poster, director, writers, actors, description, rating, year, duration, country, genres, age, comments} = film;
   const date = year.format(`D MMMM YYYY`);
@@ -54,6 +59,11 @@ const createPopupTemplate = (film) => {
   const commentsList = createCommentsTemplate(comments);
   const emojiList = createEmojiList(emotions);
   const newComment = createNewCommentTemplate(emojiList);
+
+  const watchlistButton = createButtonTemplate(`watchlist`, film.isInWatchlist, `Add to watchlist`);
+  const historyButton = createButtonTemplate(`watched`, film.isInHistory, `Already watched`);
+  const favoriteButton = createButtonTemplate(`favorite`, film.isFavorite, `Add to favorites`);
+
 
   return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
@@ -120,14 +130,9 @@ const createPopupTemplate = (film) => {
         </div>
 
         <section class="film-details__controls">
-          <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
-          <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
-
-          <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched">
-          <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
-
-          <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite">
-          <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
+          ${watchlistButton}
+          ${historyButton}
+          ${favoriteButton}
         </section>
       </div>
 
