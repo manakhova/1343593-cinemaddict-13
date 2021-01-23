@@ -24,7 +24,7 @@ const createCommentsTemplate = (comments) => {
   </li>`).join(`\n`);
 };
 
-const createEmojiList = (emojiItems) => {
+const createEmojiList = (emojiItems) => { // скрытое поле пока не понимаю, как сделать
   return emojiItems.map((emotion) =>
     `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}">
     <label class="film-details__emoji-label" for="emoji-${emotion}">
@@ -32,9 +32,11 @@ const createEmojiList = (emojiItems) => {
     </label>`).join(`\n`);
 };
 
-const createNewCommentTemplate = (emojiList) => {
+const createNewCommentTemplate = (emojiSelected, emojiList) => {
   return `<div class="film-details__new-comment">
-    <div class="film-details__add-emoji-label"></div>
+    <div class="film-details__add-emoji-label">
+      ${emojiSelected !== `` ? `<img src="${emojiSelected}" width="55" height="55" alt="emoji">` : ``}
+    </div>
 
     <label class="film-details__comment-label">
       <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
@@ -51,18 +53,18 @@ const createButtonTemplate = (buttonIdName, isActive, buttonName) => {
   <label for="${buttonIdName}" class="film-details__control-label film-details__control-label--${buttonIdName}">${buttonName}</label>`;
 };
 
-const createPopupTemplate = (film) => {
-  const {title, originalTitle, poster, director, writers, actors, description, rating, year, duration, country, genres, age, comments} = film;
+const createPopupTemplate = (data) => {
+  const {title, originalTitle, poster, director, writers, actors, description, rating, year, duration, country, genres, age, comments, emojiSelected} = data;
   const date = year.format(`D MMMM YYYY`);
 
   const genreItem = genres.length > 1 ? `Genres` : `Genre`;
   const commentsList = createCommentsTemplate(comments);
   const emojiList = createEmojiList(emotions);
-  const newComment = createNewCommentTemplate(emojiList);
+  const newComment = createNewCommentTemplate(emojiSelected, emojiList);
 
-  const watchlistButton = createButtonTemplate(`watchlist`, film.isInWatchlist, `Add to watchlist`);
-  const historyButton = createButtonTemplate(`watched`, film.isInHistory, `Already watched`);
-  const favoriteButton = createButtonTemplate(`favorite`, film.isFavorite, `Add to favorites`);
+  const watchlistButton = createButtonTemplate(`watchlist`, data.isInWatchlist, `Add to watchlist`);
+  const historyButton = createButtonTemplate(`watched`, data.isInHistory, `Already watched`);
+  const favoriteButton = createButtonTemplate(`favorite`, data.isFavorite, `Add to favorites`);
 
 
   return `<section class="film-details">
@@ -152,17 +154,33 @@ const createPopupTemplate = (film) => {
 export default class FilmPopup extends SmartView {
   constructor(film) {
     super();
-    this._film = film;
+    this._film = FilmPopup.parseFilmToData(film);
 
     this._closePopupHandler = this._closePopupHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._historyClickHandler = this._historyClickHandler.bind(this);
     this._watchlistClickHandler = this._watchlistClickHandler.bind(this);
-    // this._commentInputHandler = this._commentInputHandler.bind(this);
     this._emojiClickHandler = this._emojiClickHandler.bind(this);
 
-    // this._setCommentInputHandler();
     this._setEmojiAddHandler();
+  }
+
+  static parseFilmToData(film) {
+    return Object.assign(
+        {},
+        film,
+        {
+          emojiSelected: ``
+        }
+    );
+  }
+
+  static parseDataToFilm(data) {
+    let film = Object.assign({}, data);
+
+    delete film.emojiSelected;
+
+    return film;
   }
 
   reset(film) {
@@ -176,7 +194,7 @@ export default class FilmPopup extends SmartView {
 
   _closePopupHandler(evt) {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.closeClick();
   }
 
   _favoriteClickHandler(evt) {
@@ -194,28 +212,19 @@ export default class FilmPopup extends SmartView {
     this._callback.historyClick();
   }
 
-  // не понимаю, как сделать аналогично демо, у меня нет такого же доступа к форме нового коммента, это не часть film
-  // _commentInputHandler(evt) {
-  //   evt.preventDefault();
-  //   this.updateData({
-  //     comment(???): evt.target.value
-  //   }, true);
-  // }
-
-  _emojiClickHandler(evt) { // это тоже нужно было делать с использованием updateData или так тоже можно?
+  _emojiClickHandler(evt) { // по идее, поскольку emojiSelected теперь не пустой, шаблон нового коммента должен сработать, но нет
+    evt.preventDefault();
     if (evt.target.tagName !== `IMG`) {
       return;
     }
 
-    evt.preventDefault();
-    const emojiAdd = this.getElement().querySelector(`.film-details__add-emoji-label`);
-    const emojiAddedItemTemplate = `<img src="${evt.target.src}" width="55" height="55" alt="emoji">`;
-
-    emojiAdd.innerHTML = emojiAddedItemTemplate;
+    this.updateData({
+      emojiSelected: evt.target.src
+    });
   }
 
   setClosePopupHandler(callback) {
-    this._callback.click = callback;
+    this._callback.closeClick = callback;
     this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, this._closePopupHandler);
   }
 
@@ -234,21 +243,15 @@ export default class FilmPopup extends SmartView {
     this.getElement().querySelector(`#watched`).addEventListener(`change`, this._historyClickHandler);
   }
 
-  // _setCommentInputHandler() {
-  //   this.getElement().querySelector(`.film-details__comment-input`).addEventListener(`input`, this._commentInputHandler);
-  // }
-
   _setEmojiAddHandler() {
     this.getElement().querySelector(`.film-details__emoji-list`).addEventListener(`click`, this._emojiClickHandler);
   }
 
-
   restoreHandlers() {
-    this.setClosePopupHandler(this._handlePopupCloseButtonClick);
-    this.setWatchlistClickHandler(this._handleWatchlistClick);
-    this.setHistoryClickHandler(this._handleHistoryClick);
-    this.setFavoriteClickHandler(this._handleFavoriteClick);
-    // this._setCommentInputHandler();
+    this.setClosePopupHandler(this._callback.closeClick);
+    this.setWatchlistClickHandler(this._callback.watchlistClick);
+    this.setHistoryClickHandler(this._callback.historyClick);
+    this.setFavoriteClickHandler(this._callback.favoriteClick);
     this._setEmojiAddHandler();
   }
 }
