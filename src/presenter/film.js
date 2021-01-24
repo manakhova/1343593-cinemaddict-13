@@ -39,6 +39,11 @@ export default class Film {
     this._filmComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._filmComponent.setOpenPopupHandler(this._handleFilmCardClick);
 
+    this._filmPopupComponent.setClosePopupHandler(this._handlePopupCloseButtonClick);
+    this._filmPopupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
+    this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
+    this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+
     if (prevFilmComponent === null || prevFilmPopupComponent === null) {
       render(this._filmListContainer, this._filmComponent, RenderPosition.BEFOREEND);
       return;
@@ -103,13 +108,7 @@ export default class Film {
 
     this._changeMode();
     this._mode = Mode.POPUP;
-
-    this._filmPopupComponent.setClosePopupHandler(this._handlePopupCloseButtonClick);
     document.addEventListener(`keydown`, this._handlePopupEscKeyDown);
-
-    this._filmPopupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
-    this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
-    this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
     render(footerMainElement, this._filmPopupComponent, RenderPosition.AFTEREND);
   }
