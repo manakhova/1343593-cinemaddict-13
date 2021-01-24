@@ -24,7 +24,7 @@ const createCommentsTemplate = (comments) => {
   </li>`).join(`\n`);
 };
 
-const createEmojiList = (emojiItems, emojiSelected) => { // скрытое поле пока не понимаю, как сделать
+const createEmojiList = (emojiItems, emojiSelected) => {
   return emojiItems.map((emotion) =>
     `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" 
     id="emoji-${emotion}" value="${emotion}" ${emojiSelected === emotion ? `checked` : ``}>
