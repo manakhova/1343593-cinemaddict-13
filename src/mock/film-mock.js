@@ -179,7 +179,7 @@ const generateComments = () => {
     text: generateText(),
     emotion: generateEmotion(),
     author: generateAuthor(),
-    day: generateDate().format(`DD/MM/YYYY HH:mm`)
+    day: generateDate().format(`YYYY/MM/DD HH:mm`)
   };
 
   const randomCount = getRandomInteger(0, 5);
