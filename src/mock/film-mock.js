@@ -22,9 +22,11 @@ const generateGenre = () => {
     `Horror`,
     `Romance`
   ];
-  const randomIndex = getRandomInteger(0, genres.length - 1);
 
-  return genres[randomIndex];
+  const randomGenres = shuffleArray(genres);
+  const randomQuantity = getRandomInteger(1, genres.length - 1);
+
+  return randomGenres.slice(randomQuantity);
 };
 
 const generateDescription = () => {
@@ -126,6 +128,69 @@ const generateAge = () => {
   return ageLimits[randomIndex];
 };
 
+const generateText = () => {
+  const textItems = [
+    `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
+    `Cras aliquet varius magna, non porta ligula feugiat eget.`,
+    `Fusce tristique felis at fermentum pharetra.`,
+    `Aliquam id orci ut lectus varius viverra.`,
+    `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`,
+    `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`,
+    `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`,
+    `Sed sed nisi sed augue convallis suscipit in sed felis.`,
+    `Aliquam erat volutpat.`,
+    `Nunc fermentum tortor ac porta dapibus.`,
+    `In rutrum ac purus sit amet tempus.`
+  ];
+  const randomText = shuffleArray(textItems);
+  const randomQuantity = getRandomInteger(1, 5);
+
+  return randomText.slice(randomQuantity);
+};
+
+const generateEmotion = () => {
+  const emotions = [
+    `smile`,
+    `sleeping`,
+    `puke`,
+    `angry`
+  ];
+  const randomIndex = getRandomInteger(0, emotions.length - 1);
+
+  return emotions[randomIndex];
+};
+
+const generateAuthor = () => {
+  const authors = [
+    `Lars von Trier`,
+    `Christopher Nolan`,
+    `Andrei Tarkovsky`,
+    `Quentin Tarantino`,
+    `Sergei Eisenstein`
+  ];
+  const randomIndex = getRandomInteger(0, authors.length - 1);
+
+  return authors[randomIndex];
+};
+
+
+const generateComments = () => {
+  const comment = {
+    text: generateText(),
+    emotion: generateEmotion(),
+    author: generateAuthor(),
+    day: generateDate().format(`DD/MM/YYYY HH:mm`)
+  };
+
+  const randomCount = getRandomInteger(0, 5);
+  const comments = [];
+
+  for (let i = 0; i <= randomCount; i++) {
+    comments.push(comment);
+  }
+  return comments;
+};
+
 export const generateFilm = () => {
   return {
     id: nanoid(),
@@ -140,11 +205,11 @@ export const generateFilm = () => {
     year: generateDate(),
     duration: `${getRandomInteger(0, 4)}h ${getRandomInteger(0, 60)}m`,
     country: generateCountry(),
-    genre: generateGenre(),
+    genres: generateGenre(),
     age: generateAge(),
-    commentsCount: getRandomInteger(0, 5),
+    comments: generateComments(),
     isInWatchlist: Boolean(getRandomInteger(0, 1)),
     isInHistory: Boolean(getRandomInteger(0, 1)),
-    isFavotite: Boolean(getRandomInteger(0, 1))
+    isFavorite: Boolean(getRandomInteger(0, 1))
   };
 };

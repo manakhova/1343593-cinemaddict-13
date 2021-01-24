@@ -1,8 +1,5 @@
 import FilmCardView from "../view/film-card";
 import FilmPopupView from "../view/popup";
-import CommentView from "../view/comment";
-import NewCommentView from "../view/new-comment";
-import {generateComment} from "../mock/comment-mock";
 import {render, RenderPosition, remove, replace} from "../utils/render";
 
 const Mode = {
@@ -36,28 +33,13 @@ export default class Film {
 
     this._filmComponent = new FilmCardView(film);
     this._filmPopupComponent = new FilmPopupView(film);
-    this._newCommentComponent = new NewCommentView();
-
-    const commentsList = this._filmPopupComponent.getElement().querySelector(`.film-details__comments-list`);
-    const comments = new Array(this._film.commentsCount).fill().map(generateComment);
-
-    for (let i = 0; i < this._film.commentsCount; i++) {
-      render(commentsList, new CommentView(comments[i]), RenderPosition.BEFOREEND);
-    }
-
-    const commentsContainer = this._filmPopupComponent.getElement().querySelector(`.film-details__comments-wrap`);
-    render(commentsContainer, this._newCommentComponent, RenderPosition.BEFOREEND);
 
     this._filmComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._filmComponent.setHistoryClickHandler(this._handleHistoryClick);
     this._filmComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._filmComponent.setOpenPopupHandler(this._handleFilmCardClick);
-    // перенесла все обработчики попапа сюда из _handleFilmCardClick, потому что
-    // при клике в попапе на кнопки, карточки и попапы пересоздаются (из-за this._changeData),
-    // а поскольку раньше эти обработчики навешивались только при рендере попапа, с текущего, который уже
-    // отрендерен на пред. шаге, они просто слетали
+
     this._filmPopupComponent.setClosePopupHandler(this._handlePopupCloseButtonClick);
-    document.addEventListener(`keydown`, this._handlePopupEscKeyDown);
     this._filmPopupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
     this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
@@ -72,8 +54,6 @@ export default class Film {
     }
 
     if (this._mode === Mode.POPUP) {
-      // саму каточку, даже в режиме попапа, тоже надо заменить на обновленную,
-      // иначе она просто удалялась ниже
       replace(this._filmComponent, prevFilmComponent);
       replace(this._filmPopupComponent, prevFilmPopupComponent);
     }
@@ -117,7 +97,7 @@ export default class Film {
             {},
             this._film,
             {
-              isFavotite: !this._film.isFavotite
+              isFavorite: !this._film.isFavorite
             }
         )
     );
@@ -125,10 +105,12 @@ export default class Film {
 
   _handleFilmCardClick() {
     const footerMainElement = document.querySelector(`.footer`);
-    render(footerMainElement, this._filmPopupComponent, RenderPosition.AFTEREND);
 
     this._changeMode();
     this._mode = Mode.POPUP;
+    document.addEventListener(`keydown`, this._handlePopupEscKeyDown);
+
+    render(footerMainElement, this._filmPopupComponent, RenderPosition.AFTEREND);
   }
 
   resetView() {
@@ -138,11 +120,11 @@ export default class Film {
   }
 
   _closePopup() {
+    this._filmPopupComponent.reset(this._film);
     this._filmPopupComponent.getElement().remove();
 
     this._mode = Mode.DEFAULT;
 
-    this._filmPopupComponent.removeClosePopupHandler(this._handlePopupCloseButtonClick);
     document.removeEventListener(`keydown`, this._handlePopupEscKeyDown);
   }
 
