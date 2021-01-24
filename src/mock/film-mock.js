@@ -1,4 +1,4 @@
-import {getRandomInteger, shuffleArray, generateDate} from "../utils/common";
+import {getRandomInteger, shuffleArray, generateDate, generateRuntime} from "../utils/common";
 import {nanoid} from 'nanoid';
 
 const generateTitle = () => {
@@ -179,7 +179,7 @@ const generateComments = () => {
     text: generateText(),
     emotion: generateEmotion(),
     author: generateAuthor(),
-    day: generateDate().format(`YYYY/MM/DD HH:mm`)
+    day: generateDate(`2019-04-12T16:12:32.554Z`).format(`YYYY/MM/DD HH:mm`) // добавила конкретную дату, не получилось сгенерить, все равно будет норм работать с любой такой
   };
 
   const randomCount = getRandomInteger(0, 5);
@@ -202,8 +202,8 @@ export const generateFilm = () => {
     actors: generateActors(),
     description: generateDescription(),
     rating: getRandomInteger(0, 10),
-    year: generateDate(),
-    duration: `${getRandomInteger(0, 4)}h ${getRandomInteger(0, 60)}m`,
+    year: generateDate(`2019-05-11T00:00:00.000Z`),
+    duration: generateRuntime(getRandomInteger(1, 200)),
     country: generateCountry(),
     genres: generateGenre(),
     age: generateAge(),
