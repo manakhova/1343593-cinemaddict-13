@@ -24,18 +24,19 @@ const createCommentsTemplate = (comments) => {
   </li>`).join(`\n`);
 };
 
-const createEmojiList = (emojiItems) => { // скрытое поле пока не понимаю, как сделать
+const createEmojiList = (emojiItems, emojiSelected) => { // скрытое поле пока не понимаю, как сделать
   return emojiItems.map((emotion) =>
-    `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}">
+    `<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" 
+    id="emoji-${emotion}" value="${emotion}" ${emojiSelected === emotion ? `checked` : ``}>
     <label class="film-details__emoji-label" for="emoji-${emotion}">
-      <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji">
+      <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji" data-id="${emotion}">
     </label>`).join(`\n`);
 };
 
 const createNewCommentTemplate = (emojiSelected, emojiList) => {
   return `<div class="film-details__new-comment">
     <div class="film-details__add-emoji-label">
-      ${emojiSelected !== `` ? `<img src="${emojiSelected}" width="55" height="55" alt="emoji">` : ``}
+      ${emojiSelected !== `` ? `<img src="./images/emoji/${emojiSelected}.png" width="55" height="55" alt="emoji">` : ``}
     </div>
 
     <label class="film-details__comment-label">
@@ -59,7 +60,7 @@ const createPopupTemplate = (data) => {
 
   const genreItem = genres.length > 1 ? `Genres` : `Genre`;
   const commentsList = createCommentsTemplate(comments);
-  const emojiList = createEmojiList(emotions);
+  const emojiList = createEmojiList(emotions, emojiSelected);
   const newComment = createNewCommentTemplate(emojiSelected, emojiList);
 
   const watchlistButton = createButtonTemplate(`watchlist`, data.isInWatchlist, `Add to watchlist`);
@@ -154,7 +155,7 @@ const createPopupTemplate = (data) => {
 export default class FilmPopup extends SmartView {
   constructor(film) {
     super();
-    this._film = FilmPopup.parseFilmToData(film);
+    this._data = FilmPopup.parseFilmToData(film);
 
     this._closePopupHandler = this._closePopupHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
@@ -184,12 +185,14 @@ export default class FilmPopup extends SmartView {
   }
 
   reset(film) {
-    this.updateData(film);
+    this.updateData(
+        FilmPopup.parseFilmToData(film)
+    );
   }
 
 
   getTemplate() {
-    return createPopupTemplate(this._film);
+    return createPopupTemplate(this._data);
   }
 
   _closePopupHandler(evt) {
@@ -212,14 +215,14 @@ export default class FilmPopup extends SmartView {
     this._callback.historyClick();
   }
 
-  _emojiClickHandler(evt) { // по идее, поскольку emojiSelected теперь не пустой, шаблон нового коммента должен сработать, но нет
+  _emojiClickHandler(evt) {
     evt.preventDefault();
     if (evt.target.tagName !== `IMG`) {
       return;
     }
 
     this.updateData({
-      emojiSelected: evt.target.src
+      emojiSelected: evt.target.dataset.id
     });
   }
 

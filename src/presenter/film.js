@@ -38,10 +38,7 @@ export default class Film {
     this._filmComponent.setHistoryClickHandler(this._handleHistoryClick);
     this._filmComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._filmComponent.setOpenPopupHandler(this._handleFilmCardClick);
-    // перенесла все обработчики попапа сюда из _handleFilmCardClick, потому что
-    // при клике в попапе на кнопки, карточки и попапы пересоздаются (из-за this._changeData),
-    // а поскольку раньше эти обработчики навешивались только при рендере попапа, с текущего, который уже
-    // отрендерен на пред. шаге, они просто слетали
+
     this._filmPopupComponent.setClosePopupHandler(this._handlePopupCloseButtonClick);
     document.addEventListener(`keydown`, this._handlePopupEscKeyDown);
     this._filmPopupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
@@ -122,10 +119,10 @@ export default class Film {
   }
 
   _closePopup() {
+    this._filmPopupComponent.reset(this._film);
     this._filmPopupComponent.getElement().remove();
 
     this._mode = Mode.DEFAULT;
-    // this._filmPopupComponent.reset(this._film); // выдает ошибку при сбросе
   }
 
   _handlePopupCloseButtonClick() {
