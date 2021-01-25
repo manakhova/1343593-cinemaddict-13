@@ -1,4 +1,7 @@
 import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+
+dayjs.extend(duration);
 
 export const getRandomInteger = (min, max) => {
   return Math.floor(Math.random() * (max + 1 - min) + min);
@@ -13,8 +16,15 @@ export const shuffleArray = (array) => {
   return items;
 };
 
-export const generateDate = () => {
-  return dayjs(`${getRandomInteger(1910, 2020)}-${getRandomInteger(1, 12)}-${getRandomInteger(1, 28)} ${getRandomInteger(0, 23)}:${getRandomInteger(0, 60)}`);
+export const generateDate = (date) => {
+  return dayjs(date);
+};
+
+export const generateRuntime = (runtime) => {
+  const hours = Math.floor(dayjs.duration(runtime, `m`).asHours());
+  const minutes = dayjs.duration((runtime - hours * 60), `m`).asMinutes();
+
+  return `${hours}h ${minutes}m`;
 };
 
 export const updateItem = (items, update) => {
