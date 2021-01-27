@@ -1,4 +1,5 @@
 import {getRandomInteger, shuffleArray, generateDate, generateRuntime} from "../utils/common";
+import {generateComments} from "./comment-mock";
 import {nanoid} from 'nanoid';
 
 const generateTitle = () => {
@@ -128,68 +129,6 @@ const generateAge = () => {
   return ageLimits[randomIndex];
 };
 
-const generateText = () => {
-  const textItems = [
-    `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-    `Cras aliquet varius magna, non porta ligula feugiat eget.`,
-    `Fusce tristique felis at fermentum pharetra.`,
-    `Aliquam id orci ut lectus varius viverra.`,
-    `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`,
-    `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`,
-    `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`,
-    `Sed sed nisi sed augue convallis suscipit in sed felis.`,
-    `Aliquam erat volutpat.`,
-    `Nunc fermentum tortor ac porta dapibus.`,
-    `In rutrum ac purus sit amet tempus.`
-  ];
-  const randomText = shuffleArray(textItems);
-  const randomQuantity = getRandomInteger(1, 5);
-
-  return randomText.slice(randomQuantity);
-};
-
-const generateEmotion = () => {
-  const emotions = [
-    `smile`,
-    `sleeping`,
-    `puke`,
-    `angry`
-  ];
-  const randomIndex = getRandomInteger(0, emotions.length - 1);
-
-  return emotions[randomIndex];
-};
-
-const generateAuthor = () => {
-  const authors = [
-    `Lars von Trier`,
-    `Christopher Nolan`,
-    `Andrei Tarkovsky`,
-    `Quentin Tarantino`,
-    `Sergei Eisenstein`
-  ];
-  const randomIndex = getRandomInteger(0, authors.length - 1);
-
-  return authors[randomIndex];
-};
-
-
-const generateComments = () => {
-  const comment = {
-    text: generateText(),
-    emotion: generateEmotion(),
-    author: generateAuthor(),
-    day: generateDate(`2019-04-12T16:12:32.554Z`).format(`YYYY/MM/DD HH:mm`) // добавила конкретную дату, не получилось сгенерить, все равно будет норм работать с любой такой
-  };
-
-  const randomCount = getRandomInteger(0, 5);
-  const comments = [];
-
-  for (let i = 0; i <= randomCount; i++) {
-    comments.push(comment);
-  }
-  return comments;
-};
 
 export const generateFilm = () => {
   return {
@@ -202,7 +141,7 @@ export const generateFilm = () => {
     actors: generateActors(),
     description: generateDescription(),
     rating: getRandomInteger(0, 10),
-    year: generateDate(`2019-05-11T00:00:00.000Z`),
+    year: generateDate(`${getRandomInteger(1900, 2021)}-05-11T00:00:00.000Z`),
     duration: generateRuntime(getRandomInteger(1, 200)),
     country: generateCountry(),
     genres: generateGenre(),

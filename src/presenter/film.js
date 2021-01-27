@@ -1,6 +1,7 @@
 import FilmCardView from "../view/film-card";
 import FilmPopupView from "../view/popup";
 import {render, RenderPosition, remove, replace} from "../utils/render";
+import {UserAction, UpdateType} from "../const.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -23,6 +24,8 @@ export default class Film {
     this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
     this._handleHistoryClick = this._handleHistoryClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._handleDeleteCommentClick = this._handleDeleteCommentClick.bind(this);
+    // this._handleAddCommentClick = this._handleAddCommentClick.bind(this);
   }
 
   init(film) {
@@ -43,6 +46,8 @@ export default class Film {
     this._filmPopupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
     this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._filmPopupComponent.setDeleteCommentClickHandler(this._handleDeleteCommentClick);
+    // this._filmPopupComponent.setNewCommentSubmitHandler(this._handleAddCommentClick);
 
     if (prevFilmComponent === null || prevFilmPopupComponent === null) {
       render(this._filmListContainer, this._filmComponent, RenderPosition.BEFOREEND);
@@ -68,7 +73,13 @@ export default class Film {
   }
 
   _handleWatchlistClick() {
+    // не понятно, какой тип обновления тут выбрать: PATCH или MINOR. Если MINOR, то карточки, как и нужно
+    // будут удаляться из списка Watchlist, например, если данный фильм теперь не отмечен в этом списке.
+    // С другой стороны, если эти отметки производить в попапе, то он удаляется вместе с карточкой, чего не
+    // должно быть по тз. PATCH же не закрывает попап, но и не удаляет карточку из списка, когда это нужно
     this._changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
         Object.assign(
             {},
             this._film,
@@ -81,6 +92,8 @@ export default class Film {
 
   _handleHistoryClick() {
     this._changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
         Object.assign(
             {},
             this._film,
@@ -93,6 +106,8 @@ export default class Film {
 
   _handleFavoriteClick() {
     this._changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
         Object.assign(
             {},
             this._film,
@@ -112,6 +127,22 @@ export default class Film {
 
     render(footerMainElement, this._filmPopupComponent, RenderPosition.AFTEREND);
   }
+
+  _handleDeleteCommentClick(comment) {
+    this._changeData(
+        UserAction.DELETE_COMMENT,
+        UpdateType.PATCH,
+        comment // ???
+    );
+  }
+
+  // _handleAddCommentClick(comment) {
+  //   this._changeData(
+  //       UserAction.ADD_COMMENT,
+  //       UpdateType.PATCH,
+  //       comment // ???
+  //   );
+  // }
 
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
