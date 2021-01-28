@@ -1,6 +1,7 @@
 import SmartView from "./smart";
 import {emotions} from "../const";
 import {nanoid} from "nanoid";
+import he from "he";
 
 const createCommentsTemplate = (comments) => {
   return comments.map((comment) =>
@@ -35,7 +36,7 @@ const createNewCommentTemplate = (emojiSelected, commentText, emojiList) => {
     </div>
 
     <label class="film-details__comment-label">
-      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${commentText}</textarea>
+      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(commentText)}</textarea>
     </label>
 
     <div class="film-details__emoji-list">
