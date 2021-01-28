@@ -10,7 +10,7 @@ export default class Comments extends Observer {
     this._comments = comments.slice();
   }
 
-  getFilms() {
+  getComments() {
     return this._comments;
   }
 

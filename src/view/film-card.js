@@ -7,8 +7,8 @@ const createButtonTemplate = (buttonModifierName, isActive, buttonName) => {
             ${buttonName}</button>`;
 };
 
-const createFilmCardTemplate = (film) => {
-  const {title, poster, description, rating, year, duration, genres, comments} = film;
+const createFilmCardTemplate = (film, comments) => {
+  const {title, poster, description, rating, year, duration, genres} = film;
   const date = year.format(`YYYY`);
 
   const watchlistButton = createButtonTemplate(`add-to-watchlist`, film.isInWatchlist, `Add to watchlist`);
@@ -35,9 +35,10 @@ const createFilmCardTemplate = (film) => {
 };
 
 export default class FilmCard extends AbstractView {
-  constructor(film) {
+  constructor(film, comments) {
     super();
     this._film = film;
+    this._comments = comments;
     this._openPopupHandler = this._openPopupHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._historyClickHandler = this._historyClickHandler.bind(this);
@@ -45,7 +46,7 @@ export default class FilmCard extends AbstractView {
   }
 
   getTemplate() {
-    return createFilmCardTemplate(this._film);
+    return createFilmCardTemplate(this._film, this._comments);
   }
 
   _openPopupHandler(evt) {

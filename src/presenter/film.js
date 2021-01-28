@@ -25,17 +25,18 @@ export default class Film {
     this._handleHistoryClick = this._handleHistoryClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleDeleteCommentClick = this._handleDeleteCommentClick.bind(this);
-    // this._handleAddCommentClick = this._handleAddCommentClick.bind(this);
+    this._handleAddCommentClick = this._handleAddCommentClick.bind(this);
   }
 
-  init(film) {
+  init(film, comments) {
     this._film = film;
+    this._comments = comments;
 
     const prevFilmComponent = this._filmComponent;
     const prevFilmPopupComponent = this._filmPopupComponent;
 
-    this._filmComponent = new FilmCardView(film);
-    this._filmPopupComponent = new FilmPopupView(film);
+    this._filmComponent = new FilmCardView(film, comments);
+    this._filmPopupComponent = new FilmPopupView(film, comments);
 
     this._filmComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._filmComponent.setHistoryClickHandler(this._handleHistoryClick);
@@ -47,7 +48,7 @@ export default class Film {
     this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
     this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._filmPopupComponent.setDeleteCommentClickHandler(this._handleDeleteCommentClick);
-    // this._filmPopupComponent.setNewCommentSubmitHandler(this._handleAddCommentClick);
+    this._filmPopupComponent.setNewCommentSubmitHandler(this._handleAddCommentClick);
 
     if (prevFilmComponent === null || prevFilmPopupComponent === null) {
       render(this._filmListContainer, this._filmComponent, RenderPosition.BEFOREEND);
@@ -73,13 +74,9 @@ export default class Film {
   }
 
   _handleWatchlistClick() {
-    // не понятно, какой тип обновления тут выбрать: PATCH или MINOR. Если MINOR, то карточки, как и нужно
-    // будут удаляться из списка Watchlist, например, если данный фильм теперь не отмечен в этом списке.
-    // С другой стороны, если эти отметки производить в попапе, то он удаляется вместе с карточкой, чего не
-    // должно быть по тз. PATCH же не закрывает попап, но и не удаляет карточку из списка, когда это нужно
     this._changeData(
         UserAction.UPDATE_FILM,
-        UpdateType.PATCH,
+        UpdateType.MINOR,
         Object.assign(
             {},
             this._film,
@@ -90,10 +87,10 @@ export default class Film {
     );
   }
 
-  _handleHistoryClick() {
+  _handleHistoryClick() { // нужен дублер для попапа
     this._changeData(
         UserAction.UPDATE_FILM,
-        UpdateType.PATCH,
+        UpdateType.MINOR,
         Object.assign(
             {},
             this._film,
@@ -107,7 +104,7 @@ export default class Film {
   _handleFavoriteClick() {
     this._changeData(
         UserAction.UPDATE_FILM,
-        UpdateType.PATCH,
+        UpdateType.MINOR,
         Object.assign(
             {},
             this._film,
@@ -132,17 +129,17 @@ export default class Film {
     this._changeData(
         UserAction.DELETE_COMMENT,
         UpdateType.PATCH,
-        comment // ???
+        comment
     );
   }
 
-  // _handleAddCommentClick(comment) {
-  //   this._changeData(
-  //       UserAction.ADD_COMMENT,
-  //       UpdateType.PATCH,
-  //       comment // ???
-  //   );
-  // }
+  _handleAddCommentClick(comment) {
+    this._changeData(
+        UserAction.ADD_COMMENT,
+        UpdateType.PATCH,
+        comment
+    );
+  }
 
   resetView() {
     if (this._mode !== Mode.DEFAULT) {

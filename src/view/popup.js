@@ -1,5 +1,6 @@
 import SmartView from "./smart";
 import {emotions} from "../const";
+import {nanoid} from "nanoid";
 
 const createCommentsTemplate = (comments) => {
   return comments.map((comment) =>
@@ -48,8 +49,8 @@ const createButtonTemplate = (buttonIdName, isActive, buttonName) => {
   <label for="${buttonIdName}" class="film-details__control-label film-details__control-label--${buttonIdName}">${buttonName}</label>`;
 };
 
-const createPopupTemplate = (data) => {
-  const {title, originalTitle, poster, director, writers, actors, description, rating, year, duration, country, genres, age, comments, emojiSelected, commentText} = data;
+const createPopupTemplate = (data, comments) => {
+  const {title, originalTitle, poster, director, writers, actors, description, rating, year, duration, country, genres, age, emojiSelected, commentText} = data;
   const date = year.format(`D MMMM YYYY`);
 
   const genreItem = genres.length > 1 ? `Genres` : `Genre`;
@@ -147,19 +148,22 @@ const createPopupTemplate = (data) => {
 };
 
 export default class FilmPopup extends SmartView {
-  constructor(film) {
+  constructor(film, comments) {
     super();
     this._data = FilmPopup.parseFilmToData(film);
+    this._comments = comments;
 
     this._closePopupHandler = this._closePopupHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._historyClickHandler = this._historyClickHandler.bind(this);
     this._watchlistClickHandler = this._watchlistClickHandler.bind(this);
     this._emojiClickHandler = this._emojiClickHandler.bind(this);
+    this._commentTextHandler = this._commentTextHandler.bind(this);
     this._commentDeleteClickHandler = this._commentDeleteClickHandler.bind(this);
-    // this._newCommentSubmitHandler = this._newCommentSubmitHandler.bind(this);
+    this._newCommentSubmitHandler = this._newCommentSubmitHandler.bind(this);
 
     this._setEmojiAddHandler();
+    this._setCommentTextAddHandler();
   }
 
   static parseFilmToData(film) {
@@ -188,9 +192,8 @@ export default class FilmPopup extends SmartView {
     );
   }
 
-
   getTemplate() {
-    return createPopupTemplate(this._data);
+    return createPopupTemplate(this._data, this._comments);
   }
 
   _closePopupHandler(evt) {
@@ -224,22 +227,43 @@ export default class FilmPopup extends SmartView {
     });
   }
 
+  _commentTextHandler(evt) {
+    evt.preventDefault();
+
+    this.updateData({
+      commentText: evt.target.value
+    }, true);
+  }
+
   _commentDeleteClickHandler(evt) {
     evt.preventDefault();
 
-    this._callback.deleteClick(FilmPopup.parseDataToFilm(this._data));
+    // почему это не работает?
+    this._comments.forEach((comment) => {
+      if (comment.id === evt.target.dataset.id) {
+        this._callback.deleteClick(comment);
+      }
+    });
   }
 
-  // _newCommentSubmitHandler(evt) {
-  //   evt.preventDefault();
+  _newCommentSubmitHandler(evt) {
+    evt.preventDefault();
 
-  //   if (evt.key === `Enter` && (evt.ctrlKey || evt.metaKey)) {
-  //     if (this._data.commentText === `` || this._data.emojiSelected === ``) {
-  //       return;
-  //     }
-  //    ???
-  //   }
-  // }
+    if (evt.key === `Enter` && (evt.ctrlKey || evt.metaKey)) {
+      if (this._data.commentText === `` || this._data.emojiSelected === ``) {
+        return;
+      }
+      // и тут
+      const newComment = {
+        id: nanoid(),
+        comment: this._data.commentText,
+        emotion: this._data.emojiSelected,
+        date: new Date()
+      };
+
+      this._callback.submitHandler(newComment);
+    }
+  }
 
   setClosePopupHandler(callback) {
     this._callback.closeClick = callback;
@@ -268,14 +292,17 @@ export default class FilmPopup extends SmartView {
     });
   }
 
-
-  // setNewCommentSubmitHandler(callback) {
-  //   this._callback.submitHandler = callback;
-  //   this.getElement().querySelector(`form`).addEventListener(`submit`, this._newCommentSubmitHandler);
-  // }
+  setNewCommentSubmitHandler(callback) {
+    this._callback.submitHandler = callback;
+    this.getElement().querySelector(`form`).addEventListener(`keydown`, this._newCommentSubmitHandler);
+  }
 
   _setEmojiAddHandler() {
     this.getElement().querySelector(`.film-details__emoji-list`).addEventListener(`click`, this._emojiClickHandler);
+  }
+
+  _setCommentTextAddHandler() {
+    this.getElement().querySelector(`.film-details__comment-input`).addEventListener(`input`, this._commentTextHandler);
   }
 
   restoreHandlers() {
@@ -284,7 +311,8 @@ export default class FilmPopup extends SmartView {
     this.setHistoryClickHandler(this._callback.historyClick);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
     this.setDeleteCommentClickHandler(this._callback.deleteClick);
-    // this.setNewCommentSubmitHandler(this._callback.submitHandler);
+    this.setNewCommentSubmitHandler(this._callback.submitHandler);
     this._setEmojiAddHandler();
+    this._setCommentTextAddHandler();
   }
 }

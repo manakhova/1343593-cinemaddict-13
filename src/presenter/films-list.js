@@ -45,7 +45,7 @@ export default class FilmList {
 
   _getFilms() {
     const filterType = this._filterModel.getFilter();
-    const films = this._filmsModel.getFilms();
+    const films = [].concat(this._filmsModel.getFilms());
     const filteredFilms = filter[filterType](films);
 
     switch (this._currentSortType) {
@@ -56,6 +56,11 @@ export default class FilmList {
       default:
         return filteredFilms;
     }
+  }
+
+  _getComments() {
+    const comments = [].concat(this._commentsModel.getComments());
+    return comments;
   }
 
   _handleModeChange() {
@@ -115,8 +120,10 @@ export default class FilmList {
   }
 
   _renderFilm(film) {
+    const comments = this._getComments();
     const filmPresenter = new FilmPresenter(this._filmsMainContainer, this._handleViewAction, this._handleModeChange);
-    filmPresenter.init(film);
+
+    filmPresenter.init(film, comments);
     this._filmPresenter[film.id] = filmPresenter;
   }
 
@@ -191,7 +198,7 @@ export default class FilmList {
   _renderFilmsContainer() {
     const siteMainElement = document.querySelector(`.main`);
     const filmList = siteMainElement.querySelector(`.films`);
-    const filmMainList = siteMainElement.querySelector(`.films-list:first-of-type`);
+    const filmMainList = siteMainElement.querySelector(`.films-list`);
     const filmsMainContainer = filmMainList.querySelector(`.films-list__container`);
     this._filmList = filmList;
     this._filmMainList = filmMainList;

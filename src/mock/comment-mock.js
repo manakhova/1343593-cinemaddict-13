@@ -47,7 +47,7 @@ const generateAuthor = () => {
 };
 
 
-const generateComment = () => {
+export const generateComment = () => {
   return {
     id: nanoid(),
     text: generateText(),
@@ -57,12 +57,12 @@ const generateComment = () => {
   };
 };
 
-export const generateComments = () => {
-  const randomCount = getRandomInteger(0, 5);
-  const comments = [];
+// export const generateComments = () => {
+//   const randomCount = getRandomInteger(0, 5);
+//   const comments = [];
 
-  for (let i = 0; i <= randomCount; i++) {
-    comments.push(generateComment());
-  }
-  return comments;
-};
+//   for (let i = 0; i <= randomCount; i++) {
+//     comments.push(getRandomInteger(1, 50));
+//   }
+//   return comments;
+// };
