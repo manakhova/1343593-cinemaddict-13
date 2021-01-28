@@ -1,5 +1,4 @@
 import {getRandomInteger, shuffleArray, generateDate, generateRuntime} from "../utils/common";
-import {generateComments} from "./comment-mock";
 import {nanoid} from 'nanoid';
 
 const generateTitle = () => {
