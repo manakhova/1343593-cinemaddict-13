@@ -32,15 +32,25 @@ export default class FilmList {
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+  }
+
+  init() {
+    render(this._filmsContainer, this._filmListComponent, RenderPosition.BEFOREEND);
+    this._renderFilmsContainer();
 
     this._filmsModel.addObserver(this._handleModelEvent);
     this._commentsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
   }
 
-  init() {
-    render(this._filmsContainer, this._filmListComponent, RenderPosition.BEFOREEND);
-    this._renderFilmsContainer();
+  destroy() {
+    this._clearFilmsContainer({resetRenderedFilmCount: true, resetSortType: true});
+
+    remove(this._filmListComponent);
+
+    this._filmsModel.removeObserver(this._handleModelEvent);
+    this._commentsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
   }
 
   _getFilms() {

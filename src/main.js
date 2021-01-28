@@ -9,6 +9,7 @@ import FilterPresenter from "./presenter/filter.js";
 import FilmsModel from "./model/films";
 import CommentsModel from "./model/comments";
 import FilterModel from "./model/filter";
+import {MenuItem, FilterType} from "./const.js";
 
 const FILMS_COUNT = 14;
 
@@ -26,15 +27,31 @@ const filterModel = new FilterModel();
 const headerMainElement = document.querySelector(`.header`);
 render(headerMainElement, new ProfileView(), RenderPosition.BEFOREEND);
 
-const siteMainElement = document.querySelector(`.main`);
-render(siteMainElement, new SiteMenuView(), RenderPosition.BEFOREEND);
+const siteMenuComponent = new SiteMenuView();
 
-const menuContainer = siteMainElement.querySelector(`.main-navigation`);
+const siteMainElement = document.querySelector(`.main`);
+render(siteMainElement, siteMenuComponent, RenderPosition.BEFOREEND);
 
 const filmListPresenter = new FilmsListPresenter(siteMainElement, filmsModel, commentsModel, filterModel);
-const filterPresenter = new FilterPresenter(menuContainer, filterModel, filmsModel);
+const filterPresenter = new FilterPresenter(siteMenuComponent, filterModel, filmsModel);
 
-render(menuContainer, new StatsView(), RenderPosition.BEFOREEND);
+// render(siteMenuComponent, new StatsView(), RenderPosition.BEFOREEND);
+
+const handleSiteMenuClick = (menuItem) => {
+  switch (menuItem) {
+    case FilterType.ALL:
+    case FilterType.WATCHLIST:
+    case FilterType.HISTORY:
+    case FilterType.FAVORITES:
+      filmListPresenter.init();
+      break;
+    case MenuItem.STATISTICS:
+      filmListPresenter.destroy();
+      break;
+  }
+};
+
+siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
 filterPresenter.init();
 filmListPresenter.init();

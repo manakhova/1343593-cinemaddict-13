@@ -28,3 +28,7 @@ export const SortType = {
   DATE: `date`,
   RATING: `rating`
 };
+
+export const MenuItem = {
+  STATISTICS: `stats`
+};
