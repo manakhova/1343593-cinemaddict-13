@@ -1,68 +1,37 @@
-import {getRandomInteger, shuffleArray, generateDate} from "../utils/common";
-import {nanoid} from 'nanoid';
-
-const generateText = () => {
-  const textItems = [
-    `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-    `Cras aliquet varius magna, non porta ligula feugiat eget.`,
-    `Fusce tristique felis at fermentum pharetra.`,
-    `Aliquam id orci ut lectus varius viverra.`,
-    `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`,
-    `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`,
-    `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`,
-    `Sed sed nisi sed augue convallis suscipit in sed felis.`,
-    `Aliquam erat volutpat.`,
-    `Nunc fermentum tortor ac porta dapibus.`,
-    `In rutrum ac purus sit amet tempus.`
-  ];
-  const randomText = shuffleArray(textItems);
-  const randomQuantity = getRandomInteger(1, 5);
-
-  return randomText.slice(randomQuantity);
-};
-
-const generateEmotion = () => {
-  const emotions = [
-    `smile`,
-    `sleeping`,
-    `puke`,
-    `angry`
-  ];
-  const randomIndex = getRandomInteger(0, emotions.length - 1);
-
-  return emotions[randomIndex];
-};
-
-const generateAuthor = () => {
-  const authors = [
-    `Lars von Trier`,
-    `Christopher Nolan`,
-    `Andrei Tarkovsky`,
-    `Quentin Tarantino`,
-    `Sergei Eisenstein`
-  ];
-  const randomIndex = getRandomInteger(0, authors.length - 1);
-
-  return authors[randomIndex];
-};
-
-
-export const generateComment = () => {
-  return {
-    id: nanoid(),
-    text: generateText(),
-    emotion: generateEmotion(),
-    author: generateAuthor(),
-    day: generateDate(`2019-04-12T16:12:32.554Z`).format(`YYYY/MM/DD HH:mm`)
-  };
-};
-
-// export const generateComments = () => {
-//   const randomCount = getRandomInteger(0, 5);
-//   const comments = [];
-
-//   for (let i = 0; i <= randomCount; i++) {
-//     comments.push(getRandomInteger(1, 50));
-//   }
-//   return comments;
-// };
+export const comments = [
+  {
+    "id": "1",
+    "author": "Nevada Lee",
+    "emotion": "puke",
+    "comment": "love all Leo Di Caprio performances. He's not in the movie tho. Just telling what kinds of movies I like, I think everyone should know, love camera work, have you noticed the director's cameo.",
+    "date": "2021-01-15T18:44:27.605Z"
+  },
+  {
+    "id": "2",
+    "author": "Sergey O'Mara",
+    "emotion": "angry",
+    "comment": "a true masterpiece, my friend and I went to watch this movie and never made it there so we didn't like it at all, post-credit scene was just amazing omg.",
+    "date": "2021-01-18T19:18:23.520Z"
+  },
+  {
+    "id": "3",
+    "author": "Alice Lee",
+    "emotion": "puke",
+    "comment": "such a boring piece of..., love all Leo Di Caprio performances. He's not in the movie tho. Just telling what kinds of movies I like, I think everyone should know, have you noticed the director's cameo.",
+    "date": "2021-01-12T16:31:41.352Z"
+  },
+  {
+    "id": "4",
+    "author": "Dakota O'Caml",
+    "emotion": "smile",
+    "comment": "I fell asleep at the minute two of the film... but later I've woken up... film has nothing to do with it I just felt tired... actually, film is okay... ish, post-credit scene was just amazing omg.",
+    "date": "2021-01-30T00:47:51.652Z"
+  },
+  {
+    "id": "5",
+    "author": "Dakota O'Caml",
+    "emotion": "smile",
+    "comment": "I fell asleep at the minute two of the film... but later I've woken up... film has nothing to do with it I just felt tired... actually, film is okay... ish, post-credit scene was just amazing omg.",
+    "date": "2021-01-30T00:47:51.652Z"
+  }
+];

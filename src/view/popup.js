@@ -1,24 +1,38 @@
 import SmartView from "./smart";
 import {emotions} from "../const";
+import {generateRuntime, generateDate} from "../utils/common";
 import {nanoid} from "nanoid";
 import he from "he";
 
-const createCommentsTemplate = (comments) => {
-  return comments.map((comment) =>
-    `<li class="film-details__comment">
+const createCommentTemplate = (commentItem) => {
+  const {emotion, comment, author, date, id} = commentItem;
+  const correctDate = generateDate(date).format(`YYYY/MM/DD HH:mm`);
+  return `<li class="film-details__comment">
     <span class="film-details__comment-emoji">
-      <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
+      <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
     </span>
     <div>
-      <p class="film-details__comment-text">${comment.text}</p>
+      <p class="film-details__comment-text">${comment}</p>
       <p class="film-details__comment-info">
-        <span class="film-details__comment-author">${comment.author}</span>
-        <span class="film-details__comment-day">${comment.day}</span>
-        <button class="film-details__comment-delete data-id="${comment.id}">Delete</button>
+        <span class="film-details__comment-author">${author}</span>
+        <span class="film-details__comment-day">${correctDate}</span>
+        <button class="film-details__comment-delete" data-id="${id}">Delete</button>
       </p>
     </div>
-  </li>`).join(`\n`);
+  </li>`;
 };
+
+const createCommentsTemplate = (comments) => {
+  const commentsList = comments.slice().map((comment) => createCommentTemplate(comment))
+    .join(``);
+
+  return `
+    <ul class="film-details__comments-list">
+      ${commentsList}
+    </ul>
+  `;
+};
+
 
 const createEmojiList = (emojiItems, emojiSelected) => {
   return emojiItems.map((emotion) =>
@@ -29,14 +43,14 @@ const createEmojiList = (emojiItems, emojiSelected) => {
     </label>`).join(`\n`);
 };
 
-const createNewCommentTemplate = (emojiSelected, commentText, emojiList) => {
+const createNewCommentTemplate = (emojiSelected, comment, emojiList) => {
   return `<div class="film-details__new-comment">
     <div class="film-details__add-emoji-label">
       ${emojiSelected !== `` ? `<img src="./images/emoji/${emojiSelected}.png" width="55" height="55" alt="emoji">` : ``}
     </div>
 
     <label class="film-details__comment-label">
-      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(commentText)}</textarea>
+      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(comment)}</textarea>
     </label>
 
     <div class="film-details__emoji-list">
@@ -50,14 +64,14 @@ const createButtonTemplate = (buttonIdName, isActive, buttonName) => {
   <label for="${buttonIdName}" class="film-details__control-label film-details__control-label--${buttonIdName}">${buttonName}</label>`;
 };
 
-const createPopupTemplate = (data, comments) => {
-  const {title, originalTitle, poster, director, writers, actors, description, rating, year, duration, country, genres, age, emojiSelected, commentText} = data;
-  const date = year.format(`D MMMM YYYY`);
+const createPopupTemplate = (data, commentList) => {
+  const {title, originalTitle, poster, director, writers, actors, description, rating, year, duration, comments, country, genres, age, emojiSelected, comment} = data;
+  const date = generateDate(year).format(`D MMMM YYYY`);
 
   const genreItem = genres.length > 1 ? `Genres` : `Genre`;
-  const commentsList = createCommentsTemplate(comments);
+  const commentsList = createCommentsTemplate(commentList);
   const emojiList = createEmojiList(emotions, emojiSelected);
-  const newComment = createNewCommentTemplate(emojiSelected, commentText, emojiList);
+  const newComment = createNewCommentTemplate(emojiSelected, comment, emojiList);
 
   const watchlistButton = createButtonTemplate(`watchlist`, data.isInWatchlist, `Add to watchlist`);
   const historyButton = createButtonTemplate(`watched`, data.isInHistory, `Already watched`);
@@ -108,7 +122,7 @@ const createPopupTemplate = (data, comments) => {
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Runtime</td>
-                <td class="film-details__cell">${duration}</td>
+                <td class="film-details__cell">${generateRuntime(duration)}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Country</td>
@@ -138,9 +152,7 @@ const createPopupTemplate = (data, comments) => {
       <div class="film-details__bottom-container">
         <section class="film-details__comments-wrap">
           <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
-          <ul class="film-details__comments-list">
-            ${commentsList}
-          </ul>
+          ${commentsList}
           ${newComment}
         </section>
       </div>
@@ -173,8 +185,7 @@ export default class FilmPopup extends SmartView {
         film,
         {
           emojiSelected: ``,
-          commentText: ``,
-          date: ``
+          comment: ``
         }
     );
   }
@@ -183,6 +194,7 @@ export default class FilmPopup extends SmartView {
     let film = Object.assign({}, data);
 
     delete film.emojiSelected;
+    delete film.comment;
 
     return film;
   }
@@ -232,35 +244,33 @@ export default class FilmPopup extends SmartView {
     evt.preventDefault();
 
     this.updateData({
-      commentText: evt.target.value
+      comment: evt.target.value
     }, true);
   }
 
   _commentDeleteClickHandler(evt) {
     evt.preventDefault();
-
-    // почему это не работает?
     this._comments.forEach((comment) => {
       if (comment.id === evt.target.dataset.id) {
+        this._data.comments.splice(evt.target.dataset.id.indexOf, 1);
         this._callback.deleteClick(comment);
       }
     });
   }
 
   _newCommentSubmitHandler(evt) {
-    evt.preventDefault();
-
     if (evt.key === `Enter` && (evt.ctrlKey || evt.metaKey)) {
-      if (this._data.commentText === `` || this._data.emojiSelected === ``) {
+      if (this._data.comment === `` || this._data.emojiSelected === ``) {
         return;
       }
-      // и тут
       const newComment = {
         id: nanoid(),
-        comment: this._data.commentText,
+        author: `Kurt Gögel`,
+        comment: this._data.comment,
         emotion: this._data.emojiSelected,
         date: new Date()
       };
+      this._data.comments.push(newComment.id);
 
       this._callback.submitHandler(newComment);
     }

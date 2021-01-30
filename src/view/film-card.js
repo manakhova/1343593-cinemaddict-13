@@ -1,4 +1,5 @@
 import AbstractView from "./abstract";
+import {generateRuntime, getShortDescription, generateDate} from "../utils/common";
 
 const createButtonTemplate = (buttonModifierName, isActive, buttonName) => {
   return `<button class="film-card__controls-item button 
@@ -7,9 +8,9 @@ const createButtonTemplate = (buttonModifierName, isActive, buttonName) => {
             ${buttonName}</button>`;
 };
 
-const createFilmCardTemplate = (film, comments) => {
-  const {title, poster, description, rating, year, duration, genres} = film;
-  const date = year.format(`YYYY`);
+const createFilmCardTemplate = (film) => {
+  const {title, poster, description, rating, year, duration, comments, genres} = film;
+  const date = generateDate(year).format(`YYYY`);
 
   const watchlistButton = createButtonTemplate(`add-to-watchlist`, film.isInWatchlist, `Add to watchlist`);
   const historyButton = createButtonTemplate(`mark-as-watched`, film.isInHistory, `Mark as watched`);
@@ -20,11 +21,11 @@ const createFilmCardTemplate = (film, comments) => {
     <p class="film-card__rating">${rating}</p>
     <p class="film-card__info">
       <span class="film-card__year">${date}</span>
-      <span class="film-card__duration">${duration}</span>
+      <span class="film-card__duration">${generateRuntime(duration)}</span>
       <span class="film-card__genre">${genres[0]}</span>
     </p>
     <img src="./images/posters/${poster}" alt="" class="film-card__poster">
-    <p class="film-card__description">${description}</p>
+    <p class="film-card__description">${getShortDescription(description)}</p>
     <a class="film-card__comments">${comments.length} comments</a>
     <div class="film-card__controls">
       ${watchlistButton}
@@ -35,10 +36,9 @@ const createFilmCardTemplate = (film, comments) => {
 };
 
 export default class FilmCard extends AbstractView {
-  constructor(film, comments) {
+  constructor(film) {
     super();
     this._film = film;
-    this._comments = comments;
     this._openPopupHandler = this._openPopupHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._historyClickHandler = this._historyClickHandler.bind(this);
@@ -46,7 +46,7 @@ export default class FilmCard extends AbstractView {
   }
 
   getTemplate() {
-    return createFilmCardTemplate(this._film, this._comments);
+    return createFilmCardTemplate(this._film);
   }
 
   _openPopupHandler(evt) {

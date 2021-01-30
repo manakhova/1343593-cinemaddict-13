@@ -22,7 +22,7 @@ export default class FilmList {
 
     this._filmListComponent = new FilmsContainerView();
     this._noFilmComponent = new NoFilmView();
-    this._sortingListComponent = null;
+    this._sortListComponent = null;
     this._showMoreButtonComponent = null;
 
     this._currentSortType = SortType.DEFAULT;
@@ -43,14 +43,18 @@ export default class FilmList {
     this._filterModel.addObserver(this._handleModelEvent);
   }
 
-  destroy() {
-    this._clearFilmsContainer({resetRenderedFilmCount: true, resetSortType: true});
+  hide() {
+    this._filmListComponent.hide();
+    this._sortComponent.hide();
+  }
 
-    remove(this._filmListComponent);
+  show() {
+    this._filmListComponent.show();
+    this._sortComponent.show();
+  }
 
-    this._filmsModel.removeObserver(this._handleModelEvent);
-    this._commentsModel.removeObserver(this._handleModelEvent);
-    this._filterModel.removeObserver(this._handleModelEvent);
+  resetSort() {
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _getFilms() {
@@ -120,8 +124,8 @@ export default class FilmList {
   }
 
   _renderSort() {
-    if (this._sortingListComponent !== null) {
-      this._sortingListComponent = null;
+    if (this._sortComponent !== null) {
+      this._sortComponent = null;
     }
     this._sortComponent = new SortView(this._currentSortType);
 
@@ -130,10 +134,9 @@ export default class FilmList {
   }
 
   _renderFilm(film) {
-    const comments = this._getComments();
-    const filmPresenter = new FilmPresenter(this._filmsMainContainer, this._handleViewAction, this._handleModeChange);
+    const filmPresenter = new FilmPresenter(this._filmsMainContainer, this._handleViewAction, this._handleModeChange, this._commentsModel);
 
-    filmPresenter.init(film, comments);
+    filmPresenter.init(film);
     this._filmPresenter[film.id] = filmPresenter;
   }
 
