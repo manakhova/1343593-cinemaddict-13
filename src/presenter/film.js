@@ -190,11 +190,11 @@ export default class Film {
 
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
-      this.closePopup();
+      this._closePopup();
     }
   }
 
-  closePopup() {
+  _closePopup() {
     this._filmPopupComponent.reset(this._film);
     this._filmPopupComponent.getElement().remove();
 
@@ -204,13 +204,13 @@ export default class Film {
   }
 
   _handlePopupCloseButtonClick() {
-    this.closePopup();
+    this._closePopup();
   }
 
   _handlePopupEscKeyDown(evt) {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       evt.preventDefault();
-      this.closePopup();
+      this._closePopup();
     }
   }
 }
