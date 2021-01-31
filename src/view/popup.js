@@ -86,7 +86,7 @@ const createPopupTemplate = (data, commentList) => {
         </div>
         <div class="film-details__info-wrap">
           <div class="film-details__poster">
-            <img class="film-details__poster-img" src="./images/posters/${poster}" alt="">
+            <img class="film-details__poster-img" src="${poster}" alt="">
 
             <p class="film-details__age">${age}</p>
           </div>
@@ -161,10 +161,10 @@ const createPopupTemplate = (data, commentList) => {
 };
 
 export default class FilmPopup extends SmartView {
-  constructor(film, comments) {
+  constructor(film, model) {
     super();
     this._data = FilmPopup.parseFilmToData(film);
-    this._comments = comments;
+    this._model = model;
 
     this._closePopupHandler = this._closePopupHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
@@ -206,7 +206,7 @@ export default class FilmPopup extends SmartView {
   }
 
   getTemplate() {
-    return createPopupTemplate(this._data, this._comments);
+    return createPopupTemplate(this._data, this._model.getComments());
   }
 
   _closePopupHandler(evt) {
@@ -250,7 +250,7 @@ export default class FilmPopup extends SmartView {
 
   _commentDeleteClickHandler(evt) {
     evt.preventDefault();
-    this._comments.forEach((comment) => {
+    this._model.getComments().forEach((comment) => {
       if (comment.id === evt.target.dataset.id) {
         this._data.comments.splice(evt.target.dataset.id.indexOf, 1);
         this._callback.deleteClick(comment);
