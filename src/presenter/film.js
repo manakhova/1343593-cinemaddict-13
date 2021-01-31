@@ -1,6 +1,7 @@
 import FilmCardView from "../view/film-card";
 import FilmPopupView from "../view/popup";
 import {render, RenderPosition, remove, replace} from "../utils/render";
+import {UserAction, UpdateType} from "../const.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -8,10 +9,12 @@ const Mode = {
 };
 
 export default class Film {
-  constructor(filmListContainer, changeData, changeMode) {
+  constructor(filmListContainer, changeData, changeMode, commentsModel) {
     this._filmListContainer = filmListContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
+
+    this._commentsModel = commentsModel;
 
     this._filmCardComponent = null;
     this._filmPopupComponent = null;
@@ -23,6 +26,11 @@ export default class Film {
     this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
     this._handleHistoryClick = this._handleHistoryClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._handlePopupWatchlistClick = this._handlePopupWatchlistClick.bind(this);
+    this._handlePopupHistoryClick = this._handlePopupHistoryClick.bind(this);
+    this._handlePopupFavoriteClick = this._handlePopupFavoriteClick.bind(this);
+    this._handleDeleteCommentClick = this._handleDeleteCommentClick.bind(this);
+    this._handleAddCommentClick = this._handleAddCommentClick.bind(this);
   }
 
   init(film) {
@@ -32,7 +40,7 @@ export default class Film {
     const prevFilmPopupComponent = this._filmPopupComponent;
 
     this._filmComponent = new FilmCardView(film);
-    this._filmPopupComponent = new FilmPopupView(film);
+    this._filmPopupComponent = new FilmPopupView(film, this._commentsModel.getComments());
 
     this._filmComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._filmComponent.setHistoryClickHandler(this._handleHistoryClick);
@@ -40,9 +48,11 @@ export default class Film {
     this._filmComponent.setOpenPopupHandler(this._handleFilmCardClick);
 
     this._filmPopupComponent.setClosePopupHandler(this._handlePopupCloseButtonClick);
-    this._filmPopupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
-    this._filmPopupComponent.setHistoryClickHandler(this._handleHistoryClick);
-    this._filmPopupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._filmPopupComponent.setWatchlistClickHandler(this._handlePopupWatchlistClick);
+    this._filmPopupComponent.setHistoryClickHandler(this._handlePopupHistoryClick);
+    this._filmPopupComponent.setFavoriteClickHandler(this._handlePopupFavoriteClick);
+    this._filmPopupComponent.setDeleteCommentClickHandler(this._handleDeleteCommentClick);
+    this._filmPopupComponent.setNewCommentSubmitHandler(this._handleAddCommentClick);
 
     if (prevFilmComponent === null || prevFilmPopupComponent === null) {
       render(this._filmListContainer, this._filmComponent, RenderPosition.BEFOREEND);
@@ -69,6 +79,8 @@ export default class Film {
 
   _handleWatchlistClick() {
     this._changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.MINOR,
         Object.assign(
             {},
             this._film,
@@ -81,6 +93,8 @@ export default class Film {
 
   _handleHistoryClick() {
     this._changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.MINOR,
         Object.assign(
             {},
             this._film,
@@ -93,6 +107,50 @@ export default class Film {
 
   _handleFavoriteClick() {
     this._changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.MINOR,
+        Object.assign(
+            {},
+            this._film,
+            {
+              isFavorite: !this._film.isFavorite
+            }
+        )
+    );
+  }
+
+  _handlePopupWatchlistClick() {
+    this._changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
+        Object.assign(
+            {},
+            this._film,
+            {
+              isInWatchlist: !this._film.isInWatchlist
+            }
+        )
+    );
+  }
+
+  _handlePopupHistoryClick() {
+    this._changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
+        Object.assign(
+            {},
+            this._film,
+            {
+              isInHistory: !this._film.isInHistory
+            }
+        )
+    );
+  }
+
+  _handlePopupFavoriteClick() {
+    this._changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
         Object.assign(
             {},
             this._film,
@@ -104,13 +162,30 @@ export default class Film {
   }
 
   _handleFilmCardClick() {
-    const footerMainElement = document.querySelector(`.footer`);
-
     this._changeMode();
     this._mode = Mode.POPUP;
+    const footerMainElement = document.querySelector(`.footer`);
+
     document.addEventListener(`keydown`, this._handlePopupEscKeyDown);
 
     render(footerMainElement, this._filmPopupComponent, RenderPosition.AFTEREND);
+
+  }
+
+  _handleDeleteCommentClick(comment) {
+    this._changeData(
+        UserAction.DELETE_COMMENT,
+        UpdateType.PATCH,
+        {comment, film: this._film}
+    );
+  }
+
+  _handleAddCommentClick(comment) {
+    this._changeData(
+        UserAction.ADD_COMMENT,
+        UpdateType.PATCH,
+        {comment, film: this._film}
+    );
   }
 
   resetView() {

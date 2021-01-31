@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
+import {RankScore, RankTitle, DESCRIPTION_LENGTH} from '../const';
 
 dayjs.extend(duration);
 
@@ -27,21 +28,26 @@ export const generateRuntime = (runtime) => {
   return `${hours}h ${minutes}m`;
 };
 
-export const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
-  }
-
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1)
-  ];
-};
-
 export const sortFilmBy = (property) => (filmA, filmB) => {
   return filmB[property] - filmA[property];
 };
+
+export const getUserRank = (films) => {
+  const watchedFilmsCount = films.reduce((count, film) => count + Number(film.isInHistory), 0);
+
+  if (watchedFilmsCount >= RankScore.NOVICE.MIN && watchedFilmsCount <= RankScore.NOVICE.MAX) {
+    return RankTitle.NOVICE;
+  } else if (watchedFilmsCount >= RankScore.FAN.MIN && watchedFilmsCount <= RankScore.FAN.MAX) {
+    return RankTitle.FAN;
+  } else if (watchedFilmsCount > RankScore.FAN.MAX) {
+    return RankTitle.MOVIE_BUFF;
+  } else {
+    return RankTitle.NONE;
+  }
+};
+
+export const getShortDescription = (description) => {
+  return description.length >= DESCRIPTION_LENGTH ? `${description.slice(0, DESCRIPTION_LENGTH - 1)}...` : description;
+};
+
 

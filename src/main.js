@@ -1,27 +1,40 @@
 import {render, RenderPosition} from "./utils/render";
 import ProfileView from "./view/profile";
 import SiteMenuView from "./view/site-menu";
-import FilterView from "./view/filter";
-import StatsView from "./view/stats";
+import FooterStatsView from './view/footer-stats';
 import {generateFilm} from "./mock/film-mock";
-import {generateFilter} from "./mock/filter-mock";
+import {comments} from "./mock/comment-mock";
 import FilmsListPresenter from "./presenter/films-list";
+import FilterPresenter from "./presenter/filter.js";
+import FilmsModel from "./model/films";
+import CommentsModel from "./model/comments";
+import FilterModel from "./model/filter";
 
-const FILMS_COUNT = 21;
+const FILMS_COUNT = 22;
 
 const films = new Array(FILMS_COUNT).fill().map(generateFilm);
-const filters = generateFilter(films);
+
+const filmsModel = new FilmsModel();
+filmsModel.setFilms(films);
+
+const commentsModel = new CommentsModel();
+commentsModel.setComments(comments);
+
+const filterModel = new FilterModel();
+
+const headerMainElement = document.querySelector(`.header`);
+render(headerMainElement, new ProfileView(filmsModel.getFilms()), RenderPosition.BEFOREEND);
+
+const footerMainElement = document.querySelector(`.footer`);
+render(footerMainElement, new FooterStatsView(filmsModel.getFilms().length), RenderPosition.BEFOREEND);
+
+const siteMenuComponent = new SiteMenuView();
 
 const siteMainElement = document.querySelector(`.main`);
-const headerMainElement = document.querySelector(`.header`);
+render(siteMainElement, siteMenuComponent, RenderPosition.BEFOREEND);
 
-render(headerMainElement, new ProfileView(), RenderPosition.BEFOREEND);
-render(siteMainElement, new SiteMenuView(), RenderPosition.BEFOREEND);
+const filmListPresenter = new FilmsListPresenter(siteMainElement, filmsModel, commentsModel, filterModel);
+const filterPresenter = new FilterPresenter(siteMenuComponent, filterModel, filmsModel);
 
-const menuContainer = siteMainElement.querySelector(`.main-navigation`);
-
-render(menuContainer, new FilterView(filters), RenderPosition.BEFOREEND);
-render(menuContainer, new StatsView(), RenderPosition.BEFOREEND);
-
-const filmListPresenter = new FilmsListPresenter(siteMainElement);
-filmListPresenter.init(films);
+filterPresenter.init();
+filmListPresenter.init();

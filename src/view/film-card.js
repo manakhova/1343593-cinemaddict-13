@@ -1,4 +1,5 @@
 import AbstractView from "./abstract";
+import {generateRuntime, getShortDescription, generateDate} from "../utils/common";
 
 const createButtonTemplate = (buttonModifierName, isActive, buttonName) => {
   return `<button class="film-card__controls-item button 
@@ -8,8 +9,8 @@ const createButtonTemplate = (buttonModifierName, isActive, buttonName) => {
 };
 
 const createFilmCardTemplate = (film) => {
-  const {title, poster, description, rating, year, duration, genres, comments} = film;
-  const date = year.format(`YYYY`);
+  const {title, poster, description, rating, year, duration, comments, genres} = film;
+  const date = generateDate(year).format(`YYYY`);
 
   const watchlistButton = createButtonTemplate(`add-to-watchlist`, film.isInWatchlist, `Add to watchlist`);
   const historyButton = createButtonTemplate(`mark-as-watched`, film.isInHistory, `Mark as watched`);
@@ -20,11 +21,11 @@ const createFilmCardTemplate = (film) => {
     <p class="film-card__rating">${rating}</p>
     <p class="film-card__info">
       <span class="film-card__year">${date}</span>
-      <span class="film-card__duration">${duration}</span>
+      <span class="film-card__duration">${generateRuntime(duration)}</span>
       <span class="film-card__genre">${genres[0]}</span>
     </p>
     <img src="./images/posters/${poster}" alt="" class="film-card__poster">
-    <p class="film-card__description">${description}</p>
+    <p class="film-card__description">${getShortDescription(description)}</p>
     <a class="film-card__comments">${comments.length} comments</a>
     <div class="film-card__controls">
       ${watchlistButton}

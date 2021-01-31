@@ -1,4 +1,4 @@
-import {getRandomInteger, shuffleArray, generateDate, generateRuntime} from "../utils/common";
+import {getRandomInteger, shuffleArray, generateDate} from "../utils/common";
 import {nanoid} from 'nanoid';
 
 const generateTitle = () => {
@@ -16,37 +16,17 @@ const generateTitle = () => {
 
 const generateGenre = () => {
   const genres = [
-    `Musical`,
+    `Sci-Fi`,
+    `Animation`,
+    `Fantasy`,
     `Comedy`,
-    `Drama`,
-    `Horror`,
-    `Romance`
+    `TV Series`
   ];
 
   const randomGenres = shuffleArray(genres);
   const randomQuantity = getRandomInteger(1, genres.length - 1);
 
   return randomGenres.slice(randomQuantity);
-};
-
-const generateDescription = () => {
-  const descriptions = [
-    `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-    `Cras aliquet varius magna, non porta ligula feugiat eget.`,
-    `Fusce tristique felis at fermentum pharetra.`,
-    `Aliquam id orci ut lectus varius viverra.`,
-    `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`,
-    `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`,
-    `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`,
-    `Sed sed nisi sed augue convallis suscipit in sed felis.`,
-    `Aliquam erat volutpat.`,
-    `Nunc fermentum tortor ac porta dapibus.`,
-    `In rutrum ac purus sit amet tempus.`
-  ];
-  const randomDescriptions = shuffleArray(descriptions);
-  const randomQuantity = getRandomInteger(1, 5);
-
-  return randomDescriptions.slice(randomQuantity);
 };
 
 const generatePoster = () => {
@@ -128,70 +108,9 @@ const generateAge = () => {
   return ageLimits[randomIndex];
 };
 
-const generateText = () => {
-  const textItems = [
-    `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-    `Cras aliquet varius magna, non porta ligula feugiat eget.`,
-    `Fusce tristique felis at fermentum pharetra.`,
-    `Aliquam id orci ut lectus varius viverra.`,
-    `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`,
-    `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`,
-    `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`,
-    `Sed sed nisi sed augue convallis suscipit in sed felis.`,
-    `Aliquam erat volutpat.`,
-    `Nunc fermentum tortor ac porta dapibus.`,
-    `In rutrum ac purus sit amet tempus.`
-  ];
-  const randomText = shuffleArray(textItems);
-  const randomQuantity = getRandomInteger(1, 5);
-
-  return randomText.slice(randomQuantity);
-};
-
-const generateEmotion = () => {
-  const emotions = [
-    `smile`,
-    `sleeping`,
-    `puke`,
-    `angry`
-  ];
-  const randomIndex = getRandomInteger(0, emotions.length - 1);
-
-  return emotions[randomIndex];
-};
-
-const generateAuthor = () => {
-  const authors = [
-    `Lars von Trier`,
-    `Christopher Nolan`,
-    `Andrei Tarkovsky`,
-    `Quentin Tarantino`,
-    `Sergei Eisenstein`
-  ];
-  const randomIndex = getRandomInteger(0, authors.length - 1);
-
-  return authors[randomIndex];
-};
-
-
-const generateComments = () => {
-  const comment = {
-    text: generateText(),
-    emotion: generateEmotion(),
-    author: generateAuthor(),
-    day: generateDate(`2019-04-12T16:12:32.554Z`).format(`YYYY/MM/DD HH:mm`) // добавила конкретную дату, не получилось сгенерить, все равно будет норм работать с любой такой
-  };
-
-  const randomCount = getRandomInteger(0, 5);
-  const comments = [];
-
-  for (let i = 0; i <= randomCount; i++) {
-    comments.push(comment);
-  }
-  return comments;
-};
 
 export const generateFilm = () => {
+  const isInHistory = Boolean(getRandomInteger(0, 1));
   return {
     id: nanoid(),
     title: generateTitle(),
@@ -200,16 +119,18 @@ export const generateFilm = () => {
     director: generateDirector(),
     writers: generateWriters(),
     actors: generateActors(),
-    description: generateDescription(),
+    description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget.
+    Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. `,
     rating: getRandomInteger(0, 10),
-    year: generateDate(`2019-05-11T00:00:00.000Z`),
-    duration: generateRuntime(getRandomInteger(1, 200)),
+    year: `${getRandomInteger(1900, 2021)}-05-11T00:00:00.000Z`,
+    duration: getRandomInteger(1, 200),
     country: generateCountry(),
     genres: generateGenre(),
     age: generateAge(),
-    comments: generateComments(),
+    comments: [`1`, `2`, `3`, `4`, `5`],
     isInWatchlist: Boolean(getRandomInteger(0, 1)),
-    isInHistory: Boolean(getRandomInteger(0, 1)),
-    isFavorite: Boolean(getRandomInteger(0, 1))
+    isInHistory,
+    isFavorite: Boolean(getRandomInteger(0, 1)),
+    watchingDate: isInHistory ? generateDate(`${getRandomInteger(2020, 2021)}-01-29T00:00:00.000Z`) : null,
   };
 };
