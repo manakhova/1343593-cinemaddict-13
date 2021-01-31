@@ -48,13 +48,14 @@ export default class FilmList {
     this._sortComponent.hide();
   }
 
+  resetSort() {
+    this._clearFilmsContainer({resetRenderedFilmCount: true, resetSortType: true});
+    this._renderFilmsContainer();
+  }
+
   show() {
     this._filmListComponent.show();
     this._sortComponent.show();
-  }
-
-  resetSort() {
-    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _getFilms() {

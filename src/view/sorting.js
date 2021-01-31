@@ -21,6 +21,10 @@ export class SortView extends AbstractView {
     return createSortingTemplate(this._currentSortType);
   }
 
+  getSortType() {
+    return this._currentSortType;
+  }
+
   _sortTypeChangeHandler(evt) {
     if (evt.target.tagName !== `A`) {
       return;
