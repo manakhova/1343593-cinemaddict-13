@@ -9,7 +9,7 @@ const Mode = {
 };
 
 export default class Film {
-  constructor(filmListContainer, changeData, changeMode, commentsModel) {
+  constructor(filmListContainer, changeData, changeMode, commentsModel, api) {
     this._filmListContainer = filmListContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
@@ -19,6 +19,7 @@ export default class Film {
     this._filmCardComponent = null;
     this._filmPopupComponent = null;
     this._mode = Mode.DEFAULT;
+    this._api = api;
 
     this._handlePopupCloseButtonClick = this._handlePopupCloseButtonClick.bind(this);
     this._handlePopupEscKeyDown = this._handlePopupEscKeyDown.bind(this);
@@ -40,7 +41,7 @@ export default class Film {
     const prevFilmPopupComponent = this._filmPopupComponent;
 
     this._filmComponent = new FilmCardView(film);
-    this._filmPopupComponent = new FilmPopupView(film, this._commentsModel.getComments());
+    this._filmPopupComponent = new FilmPopupView(film, this._commentsModel);
 
     this._filmComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._filmComponent.setHistoryClickHandler(this._handleHistoryClick);
@@ -164,12 +165,22 @@ export default class Film {
   _handleFilmCardClick() {
     this._changeMode();
     this._mode = Mode.POPUP;
-    const footerMainElement = document.querySelector(`.footer`);
+
+    this._api.getComments(this._film.id)
+      .then((comments) => {
+        this._commentsModel.setComments(comments);
+        this._renderPopup();
+      })
+      .catch(() => {
+        this._commentsModel.setComments([]);
+      });
 
     document.addEventListener(`keydown`, this._handlePopupEscKeyDown);
+  }
 
+  _renderPopup() {
+    const footerMainElement = document.querySelector(`.footer`);
     render(footerMainElement, this._filmPopupComponent, RenderPosition.AFTEREND);
-
   }
 
   _handleDeleteCommentClick(comment) {
