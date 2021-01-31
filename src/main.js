@@ -2,6 +2,8 @@ import {render, RenderPosition} from "./utils/render";
 import ProfileView from "./view/profile";
 import SiteMenuView from "./view/site-menu";
 import FooterStatsView from './view/footer-stats';
+import StatsView from "./view/stats";
+import {FilterType} from "./const.js";
 import {generateFilm} from "./mock/film-mock";
 import {comments} from "./mock/comment-mock";
 import FilmsListPresenter from "./presenter/films-list";
@@ -35,6 +37,29 @@ render(siteMainElement, siteMenuComponent, RenderPosition.BEFOREEND);
 
 const filmListPresenter = new FilmsListPresenter(siteMainElement, filmsModel, commentsModel, filterModel);
 const filterPresenter = new FilterPresenter(siteMenuComponent, filterModel, filmsModel);
+
+const statsComponent = new StatsView(filmsModel);
+render(siteMainElement, statsComponent, RenderPosition.BEFOREEND);
+statsComponent.hide();
+
+const handleSiteMenuClick = (menuItem) => {
+  switch (menuItem) {
+    case FilterType.ALL:
+    case FilterType.WATCHLIST:
+    case FilterType.HISTORY:
+    case FilterType.FAVORITES:
+      filmListPresenter.resetSort();
+      filmListPresenter.show();
+      statsComponent.hide();
+      break;
+    case FilterType.STATISTICS:
+      filmListPresenter.hide();
+      statsComponent.show();
+      break;
+  }
+};
+
+siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
 filterPresenter.init();
 filmListPresenter.init();
