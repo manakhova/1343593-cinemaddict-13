@@ -10,7 +10,8 @@ const Mode = {
 
 export const State = {
   DELETING: `DELETING`,
-  ABORTING: `ABORTING`
+  ABORTING: `ABORTING`,
+  ADDING: `ADDING`
 };
 
 export default class Film {
@@ -88,9 +89,15 @@ export default class Film {
 
     switch (state) {
       case State.ADDING:
+        this._filmPopupComponent.updateData({
+          isDisabled: true,
+          isDeleting: false
+        });
+        break;
       case State.DELETING:
         this._filmPopupComponent.updateData({
-          isDisabled: true
+          isDisabled: true,
+          isDeleting: true
         });
         break;
       case State.ABORTING:
@@ -199,6 +206,28 @@ export default class Film {
       })
       .catch(() => {
         this._commentsModel.setComments([]);
+        this._renderPopup();
+
+        const node = document.createElement(`div`);
+        node.style = `
+        font-family: var(--font);
+        font-weight: 700;
+        font-size: 24px;
+        width: 265px; 
+        margin: 0 auto; 
+        padding: 15px 0;
+        text-align: center; `;
+        node.textContent = `Failed To Load Comments`;
+
+        const commentContainer = document.querySelector(`.film-details__comments-wrap`);
+        commentContainer.remove();
+
+        const noCommentMessageContainer = document.querySelector(`.film-details__bottom-container`);
+        noCommentMessageContainer.insertAdjacentElement(RenderPosition.BEFOREEND, node);
+
+        document.querySelectorAll(`.film-details__control-input`).forEach((button) => {
+          button.setAttribute(`disabled`, `disabled`);
+        });
       });
 
     document.addEventListener(`keydown`, this._handlePopupEscKeyDown);

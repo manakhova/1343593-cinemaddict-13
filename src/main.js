@@ -11,7 +11,7 @@ import CommentsModel from "./model/comments";
 import FilterModel from "./model/filter";
 import Api from "./api.js";
 
-const AUTHORIZATION = `Basic zksfjgblaisrgaoe8f`;
+const AUTHORIZATION = `Basic jlkjloiuyiotuivytvuyu`;
 const END_POINT = `https://13.ecmascript.pages.academy/cinemaddict`;
 
 const api = new Api(END_POINT, AUTHORIZATION);
@@ -55,7 +55,10 @@ filmListPresenter.init();
 
 api.getFilms().then((films) => {
   filmsModel.setFilms(UpdateType.INIT, films);
-  render(headerMainElement, new ProfileView(films), RenderPosition.BEFOREEND);
+
+  const profile = new ProfileView(filmsModel);
+
+  render(headerMainElement, profile, RenderPosition.BEFOREEND);
   render(siteMainElement, siteMenuComponent, RenderPosition.AFTERBEGIN);
   render(footerMainElement, new FooterStatsView(films.length), RenderPosition.BEFOREEND);
   siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);

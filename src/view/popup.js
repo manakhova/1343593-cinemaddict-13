@@ -22,8 +22,8 @@ const createCommentTemplate = (commentItem, isDeleting) => {
   </li>`;
 };
 
-const createCommentListTemplate = (comments, isDisabled, isDeleting) => {
-  const commentsList = comments.slice().map((item) => createCommentTemplate(item, isDisabled, isDeleting)).join(``);
+const createCommentListTemplate = (comments, isDeleting) => {
+  const commentsList = comments.slice().map((item) => createCommentTemplate(item, isDeleting)).join(``);
 
   return `
     <ul class="film-details__comments-list">
@@ -68,7 +68,7 @@ const createPopupTemplate = (data, commentList) => {
   const date = generateDate(year).format(`D MMMM YYYY`);
 
   const genreItem = genres.length > 1 ? `Genres` : `Genre`;
-  const commentsList = createCommentListTemplate(commentList, isDisabled, isDeleting);
+  const commentsList = createCommentListTemplate(commentList, isDeleting);
   const emojiList = createEmojiList(emotions, emojiSelected);
   const newComment = createNewCommentTemplate(emojiSelected, comment, emojiList, isDisabled);
 
@@ -252,6 +252,7 @@ export default class FilmPopup extends SmartView {
   }
 
   _commentDeleteClickHandler(evt) {
+    // deletingId
     evt.preventDefault();
     this._model.getComments().forEach((comment) => {
       if (comment.id === evt.target.dataset.id) {

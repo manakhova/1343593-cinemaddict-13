@@ -1,5 +1,5 @@
 import {getUserRank} from "../utils/common";
-import AbstractView from "./abstract";
+import SmartView from "./smart";
 
 const createProfileTemplate = (films) => {
   return `<section class="header__profile profile ${getUserRank(films) === `` ? `visually-hidden` : ``}">
@@ -9,15 +9,22 @@ const createProfileTemplate = (films) => {
 };
 
 
-export default class SiteProfile extends AbstractView {
-  constructor(films) {
+export default class SiteProfile extends SmartView {
+  constructor(model) {
     super();
 
-    this._films = films;
+    this._model = model;
+    this._data = this._model.getFilms();
   }
 
   getTemplate() {
-    return createProfileTemplate(this._films);
+    return createProfileTemplate(this._data);
   }
+
+  rerender() {
+    this._data = this._model.getFilms();
+    super.rerender();
+  }
+
 }
 
