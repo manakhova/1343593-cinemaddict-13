@@ -11,7 +11,6 @@ import CommentsModel from "./model/comments";
 import FilterModel from "./model/filter";
 import Api from "./api.js";
 
-
 const AUTHORIZATION = `Basic zksfjgblaisrgaoe8f`;
 const END_POINT = `https://13.ecmascript.pages.academy/cinemaddict`;
 

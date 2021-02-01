@@ -8,6 +8,11 @@ const Mode = {
   POPUP: `POPUP`
 };
 
+export const State = {
+  DELETING: `DELETING`,
+  ABORTING: `ABORTING`
+};
+
 export default class Film {
   constructor(filmListContainer, changeData, changeMode, commentsModel, api) {
     this._filmListContainer = filmListContainer;
@@ -71,6 +76,27 @@ export default class Film {
 
     remove(prevFilmComponent);
     remove(prevFilmPopupComponent);
+  }
+
+  setViewState(state) {
+    const resetFormState = () => {
+      this._filmPopupComponent.updateData({
+        isDisabled: false,
+        isDeleting: false
+      });
+    };
+
+    switch (state) {
+      case State.ADDING:
+      case State.DELETING:
+        this._filmPopupComponent.updateData({
+          isDisabled: true
+        });
+        break;
+      case State.ABORTING:
+        this._filmPopupComponent.shake(resetFormState);
+        break;
+    }
   }
 
   destroy() {

@@ -4,7 +4,7 @@ import {generateRuntime, generateDate} from "../utils/common";
 import {nanoid} from "nanoid";
 import he from "he";
 
-const createCommentTemplate = (commentItem) => {
+const createCommentTemplate = (commentItem, isDeleting) => {
   const {emotion, comment, author, date, id} = commentItem;
   const correctDate = generateDate(date).format(`YYYY/MM/DD HH:mm`);
   return `<li class="film-details__comment">
@@ -16,15 +16,14 @@ const createCommentTemplate = (commentItem) => {
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${author}</span>
         <span class="film-details__comment-day">${correctDate}</span>
-        <button class="film-details__comment-delete" data-id="${id}">Delete</button>
+        <button class="film-details__comment-delete" data-id="${id}">${isDeleting ? `Deleting...` : `Delete`}</button>
       </p>
     </div>
   </li>`;
 };
 
-const createCommentsTemplate = (comments) => {
-  const commentsList = comments.slice().map((comment) => createCommentTemplate(comment))
-    .join(``);
+const createCommentListTemplate = (comments, isDisabled, isDeleting) => {
+  const commentsList = comments.slice().map((item) => createCommentTemplate(item, isDisabled, isDeleting)).join(``);
 
   return `
     <ul class="film-details__comments-list">
@@ -43,14 +42,14 @@ const createEmojiList = (emojiItems, emojiSelected) => {
     </label>`).join(`\n`);
 };
 
-const createNewCommentTemplate = (emojiSelected, comment, emojiList) => {
+const createNewCommentTemplate = (emojiSelected, comment, emojiList, isDisabled) => {
   return `<div class="film-details__new-comment">
     <div class="film-details__add-emoji-label">
       ${emojiSelected !== `` ? `<img src="./images/emoji/${emojiSelected}.png" width="55" height="55" alt="emoji">` : ``}
     </div>
 
     <label class="film-details__comment-label">
-      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(comment)}</textarea>
+      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${isDisabled ? `disabled` : ``}>${he.encode(comment)}</textarea>
     </label>
 
     <div class="film-details__emoji-list">
@@ -65,13 +64,13 @@ const createButtonTemplate = (buttonIdName, isActive, buttonName) => {
 };
 
 const createPopupTemplate = (data, commentList) => {
-  const {title, originalTitle, poster, director, writers, actors, description, rating, year, duration, comments, country, genres, age, emojiSelected, comment} = data;
+  const {title, originalTitle, poster, director, writers, actors, description, rating, year, duration, comments, country, genres, age, emojiSelected, comment, isDisabled, isDeleting} = data;
   const date = generateDate(year).format(`D MMMM YYYY`);
 
   const genreItem = genres.length > 1 ? `Genres` : `Genre`;
-  const commentsList = createCommentsTemplate(commentList);
+  const commentsList = createCommentListTemplate(commentList, isDisabled, isDeleting);
   const emojiList = createEmojiList(emotions, emojiSelected);
-  const newComment = createNewCommentTemplate(emojiSelected, comment, emojiList);
+  const newComment = createNewCommentTemplate(emojiSelected, comment, emojiList, isDisabled);
 
   const watchlistButton = createButtonTemplate(`watchlist`, data.isInWatchlist, `Add to watchlist`);
   const historyButton = createButtonTemplate(`watched`, data.isInHistory, `Already watched`);
@@ -152,8 +151,8 @@ const createPopupTemplate = (data, commentList) => {
       <div class="film-details__bottom-container">
         <section class="film-details__comments-wrap">
           <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
-          ${commentsList}
-          ${newComment}
+            ${commentsList}
+            ${newComment}
         </section>
       </div>
     </form>
@@ -185,7 +184,9 @@ export default class FilmPopup extends SmartView {
         film,
         {
           emojiSelected: ``,
-          comment: ``
+          comment: ``,
+          isDisabled: false,
+          isDeleting: false
         }
     );
   }
@@ -195,6 +196,8 @@ export default class FilmPopup extends SmartView {
 
     delete film.emojiSelected;
     delete film.comment;
+    delete data.isDisabled;
+    delete data.isDeleting;
 
     return film;
   }
@@ -265,7 +268,6 @@ export default class FilmPopup extends SmartView {
       }
       const newComment = {
         id: nanoid(),
-        author: `Kurt Gögel`,
         comment: this._data.comment,
         emotion: this._data.emojiSelected,
         date: new Date()

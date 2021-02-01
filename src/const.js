@@ -53,6 +53,8 @@ export const BAR_HEIGHT = 50;
 
 export const DESCRIPTION_LENGTH = 140;
 
+export const FILM_COUNT_PER_STEP = 5;
+
 export const StatsType = {
   ALL: `all-time`,
   TODAY: `today`,

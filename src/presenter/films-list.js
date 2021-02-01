@@ -4,7 +4,7 @@ import {SortView} from "../view/sorting";
 import FilmsContainerView from "../view/films-container";
 import NoFilmView from "../view/no-film";
 import ShowMoreButtonView from "../view/show-more-button";
-import FilmPresenter from "./film";
+import FilmPresenter, {State as FilmPresenterViewState} from "./film";
 import {SortType, UpdateType, UserAction} from "../const.js";
 import {filter} from "../utils/filter.js";
 import LoadingView from "../view/loading.js";
@@ -97,10 +97,22 @@ export default class FilmList {
         });
         break;
       case UserAction.ADD_COMMENT:
-        this._commentsModel.addComment(updateType, update);
+        this._filmPresenter[update.film.id].setViewState(FilmPresenterViewState.ADDING);
+        this._api.addComment(update.comment, update.film).then(() => {
+          this._commentsModel.addComment(updateType, update);
+          this._filmsModel.updateFilm(updateType, update.film);
+        }).catch(() => {
+          this._filmPresenter[update.film.id].setViewState(FilmPresenterViewState.ABORTING);
+        });
         break;
       case UserAction.DELETE_COMMENT:
-        this._commentsModel.deleteComment(updateType, update);
+        this._filmPresenter[update.film.id].setViewState(FilmPresenterViewState.DELETING);
+        this._api.deleteComment(update.comment.id).then(() => {
+          this._commentsModel.deleteComment(updateType, update);
+          this._filmsModel.updateFilm(updateType, update.film);
+        }).catch(() => {
+          this._filmPresenter[update.film.id].setViewState(FilmPresenterViewState.ABORTING);
+        });
         break;
     }
   }
